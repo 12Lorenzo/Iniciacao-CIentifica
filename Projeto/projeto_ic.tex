@@ -1,0 +1,241 @@
+%\documentclass{article}
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage[left=3cm,right=2cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{setspace}
+\usepackage{amsmath, amssymb, mathtools}
+\usepackage{amsthm}
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{comment}
+\usepackage{url}
+\sloppy
+
+\usepackage[num,overcite]{abntex2cite}
+
+%\usepackage{uarial}
+%\usepackage{arial}
+%\renewcommand{\familydefault}{\sfdefault}
+
+\renewcommand{\rmdefault}{phv} % Arial
+\renewcommand{\sfdefault}{phv} % Arial
+
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+
+\newcommand{\np}{\mathrm{NP}}
+\newcommand{\opt}{\mathrm{OPT}}
+
+\newtheorem{thm}{Teorema}
+
+\author{}
+\date{}
+
+\begin{document}
+\onehalfspacing
+
+\setcounter{page}{0}
+
+\thispagestyle{empty}
+
+\begin{center}
+\textbf{\Large Identificação da Proposta:\\
+EDITAL 001/2020 - CoPICT/ProPq}
+\end{center}
+
+\vspace{7cm}
+
+\begin{center}
+\textbf{\LARGE Heurísticas e Meta-Heurísticas para \\ Problemas de Roteamento de Veículos}
+\end{center}
+
+\vspace{7cm}
+
+\begin{center}
+\textbf{\Large 04/2020}
+\end{center}
+
+\newpage
+
+
+
+\begin{center}
+\textbf{\Large Heurísticas e Meta-Heurísticas para \\ Problemas de Roteamento de Veículos}
+\end{center}
+
+\begin{abstract}
+%\blue{Intuição e motivação para o problema central do projeto.}\\
+Problemas de Roteamento de Veículos, de forma geral, envolvem decisões que minimizem os custos de transportar produtos através de diferentes vias empregando diversos veículos para atender uma demanda não homogênea e geograficamente dispersa. Estes problemas apresentam grande impacto para os três setores da economia, pois visam minimizar custos e modelam sistemas logísticos que estão presentes desde a produção de uma mercadoria até sua venda. Este projeto tem como objetivo o estudo de algoritmos heurísticos e meta-heurísticos para problemas de roteamento de veículos.
+
+Também temos interesse em abordar variantes deste problema, como o Problema do Roteamento de Veículos com \textit{Pickup e Delivery}, no qual uma quantidade de bens deve ser movida de pontos de coleta para pontos de entrega, e a variante com frota dimensionável, em que os veículos utilizados devem ser adquiridos mediante um custo.
+
+Como iniciação científica, esse projeto visa também a introdução do candidato na área de pesquisa científica e a complementação de sua formação em Ciência da Computação.
+
+\end{abstract}
+
+
+
+
+\section{Introdução e Justificativa}
+%\blue{Apresentação intuitiva do problema.}\\
+
+A área de otimização combinatória estuda problemas em que é necessário tomar decisões para maximizar ou minimizar um certo valor. Como exemplo, considere o problema de traçar rotas conectando centros de distribuição e clientes de modo a minimizar custos operacionais como transporte, tamanho da frota e tempo utilizado. Este problema é conhecido como \textit{Roteamento de Veículos} e é o foco deste projeto. 
+
+%\blue{Definição formal do problema.}\\
+O objetivo é criar rotas para que os veículos possam transportar as demandas, sempre respeitando uma série de restrições operacionais e minimizando os custos envolvidos. Cada rota inicia em um depósito e termina no mesmo, sendo cíclica. O Problema do Roteamento de Veículos (PRV) pode ser formulado usando programação linear inteira como na formulação de Fisher e Jaikumar \cite{fisher1981generalized}, que considera um grafo não direcionado $G = (V, E)$ com $n$ vértices, $m$ arestas e $h$ veículos. Esta formulação supõe que o depósito está no vértice com índice 1 e utiliza as seguintes variáveis e constantes:\\
+\begin{itemize}
+\item $x_{ijk}$ é uma variável binária que assume valor 1 quando o veículo $k$ visita o cliente $j$ imediatamente após o cliente $i$, 0 caso contrário.
+\item $y_{ik}$ é uma variável binária que assume valor 1 se o cliente $i$ é visitado pelo veículo $k$, 0 caso contrário.
+\item $q_{i}$ é a demanda do cliente $i$.
+\item $Q_{k}$ é a capacidade do veículo $k$.
+\item $c_{ij}$ é o custo de percorrer o trecho que vai do cliente $i$ ao $j$.\\
+
+\end{itemize}
+
+O problema pode ser formulado como se segue:
+\begin{center}
+Minimizar $\displaystyle\sum\limits_{i,j}\left(c_{ij}\sum\limits_{k=1}^{h}x_{ijk}\right)$
+\end{center}
+Sujeito a:
+\begin{equation}
+\sum\limits_{k=1}^{h}y_{ik}=1 \qquad i=2,\dots,n
+\end{equation}
+\begin{equation}
+\sum\limits_{k=1}^{h}y_{1k}=h
+\end{equation}
+\begin{equation}
+\sum\limits_{i=2}^{n}q_{i} y_{ik} \leqslant Q_{k} \qquad k=1,\dots,h
+\end{equation}
+\begin{equation}
+\sum\limits_{j\neq i}x_{ijk} = \sum\limits_{j\neq i}x_{jik} = y_{ik} \qquad i=2,\dots,n \qquad k=1,\dots,h
+\end{equation}
+\begin{equation}
+\sum\limits_{i,j \in S}x_{ijk} \leqslant |S|-1 \qquad \forall S\subseteq\lbrace2,\dots,n\rbrace ,\quad k=1,\dots,h
+\end{equation}
+\begin{equation}
+y_{ik} \in \lbrace 0,1 \rbrace \qquad i=1,\dots,n \quad k=1,\dots,h
+\end{equation}
+\begin{equation}
+x_{ijk} \in \lbrace 0,1 \rbrace \qquad i,j=1,\dots,n \quad k=1,\dots,h
+\end{equation}
+A restrição (1) assegura que cada cliente é visitado por exatamente um veículo, a restrição (2) garante que todos os veículos visitam o depósito, a restrição (3) evita que a capacidade dos veículos seja ultrapassada, as restrições (4) garantem que os veículos não param suas rotas em um cliente, e a restrição (5) elimina subrotas.\\
+
+%\blue{Relevância prática e motivação para o problema.}\\
+O Problema do Roteamento de Veículos é de grande importância para diversos setores da economia, por modelar problemas de logística, como a distribuição e gerenciamento de frotas, mercadorias e trabalhadores. Soluções boas para problemas de roteamento podem reduzir o custo de produtos e serviços, tornando-os mais competitivos e acessíveis. Muitas vezes esses problemas precisam ser resolvidos com rapidez, o que justifica a busca por algoritmos eficientes.
+
+Uma aplicação interessante envolve o transporte de cana-de-açúcar. As usinas dessa área trabalham com um depósito-pulmão no seu centro de moagem para absorver flutuações no fluxo de cana originárias de problemas operacionais, como manutenção de equipamentos e caminhões, bem como variações do comprimento do percurso ao longo do dia. Esse depósito mantém um custo operacional muito alto, pois representa uma etapa de transbordo desnecessária e exige mais esforço operacional. Nesse caso, o PRV pode ser utilizado com o objetivo de criar um sistema logístico capaz de manter a usina operando a plena carga, evitando pausas, através da definição do tipo e tamanho da frota, esquema de turnos de serviço e rotas associadas a cada caminhão. Dessa forma, minimizando flutuações no fluxo de cana, reduz-se o custo operacional da fábrica.
+
+%\blue{Dificuldade e interesse teórico do problema (NP-Difícil).}\\
+O Problema do Roteamento de Veículos é NP-difícil e, portanto, não pode ser resolvido eficientemente, isto é, em tempo polinomial no tamanho de sua entrada, a não ser que ${P =\np}$. Assim, são necessárias abordagens especiais para esse problema. As abordagens consideradas neste projeto são o desenvolvimento de algoritmos heurísticos e meta-heurísticos, que buscam soluções de boa qualidade gastando tempo aceitável, entretanto, sem garantia de atingir uma solução ótima.
+
+%\blue{Algoritmos que pretendemos estudar com referências da literatura.}\\
+Entre as técnicas de projeto a serem estudadas nesse projeto estão algoritmos  gulosos e heurísticas de busca local \cite{dasgupta2008algorithms}, além de meta-heurísticas como o \textit{Greedy Randomized Adaptive Search Procedure} (GRASP) e a \textit{Tabu Search}, que são tratadas no livro \textit{Handbook of Metaheuristics} \cite{glover2006handbook}.
+Também serão estudados os algoritmos apresentados no artigo “\textit{A hybrid algorithm for the Heterogeneous Fleet Vehicle Routing Problem}” \cite{subramanian2012hybrid} e no site do professor “Vidal Thibaut” \cite{site}, bem como outros algoritmos relacionados ao Problema do Roteamento de Veículos e suas variantes. 
+
+%\blue{Problemas, algoritmos e referências relacionados.}\\
+Além do PRV, também temos interesse em variantes dele, como a que considera demandas com \textit{Pickup} e \textit{Delivery}. Nela cada cliente é um par com um ponto de coleta e um ponto de entrega. Assim, as rotas precisam conectar o par de cada cliente para atendê-lo. Outra variante interessante envolve o dimensionamento de frota, isto é, cada veículo utilizado para construir uma rota deve ser adquirido mediante um custo, que representa o aluguel, depreciação ou diária do motorista, por exemplo.
+
+Ao longo deste projeto de Iniciação Científica, alguns dos algoritmos estudados ou projetados serão implementados e testados, a fim de avaliar o desempenho prático dos mesmos. Este projeto também visa complementar a formação do candidato, que atualmente cursa o segundo ano de Ciência da Computação na Universidade Federal de São Carlos (UFSCar). Como sua primeira iniciação científica, o projeto irá introduzi-lo ao trabalho de pesquisa e aprofundará seu conhecimento nas áreas de otimização combinatória e projeto e análise de algoritmos.
+
+
+\section{Abordagens de Pesquisa}
+
+A seguir, são apresentados conceitos e técnicas de projeto de algoritmos relevantes para este projeto de pesquisa.
+
+
+
+\subsection{Otimização Combinatória}
+
+Otimização combinatória é uma área da teoria da computação interessada na tomada de decisões sobre grandes quantidades de informação a fim de obter um resultado ótimo, seja este uma maximização de lucros ou uma redução de custos.
+Em geral, um problema desta área possui um conjunto de restrições que define o que é uma solução viável e uma função objetivo que determina o valor de cada solução.
+Em virtude da abrangência desta definição, esta área engloba inúmeros problemas, como roteamento de veículos, localização de instalações, alocação de tarefas, construção de redes, etc.
+Por isso, seus resultados encontram aplicações em diversas áreas tanto da computação quanto da pesquisa operacional.
+
+Uma grande dificuldade da área, no entanto, é que a maioria dos problemas de otimização combinatória interessantes, tanto do ponto de vista prático quanto do teórico, são NP-difíceis.
+Portanto, a menos que P$=$NP, não existem algoritmos eficientes para resolver estes problemas de forma ótima para qualquer instância, sendo que consideramos eficientes algoritmos cujo tempo de execução é limitado por um polinômio no tamanho da instância.
+
+Diferentes abordagens contornam esta dificuldade abrindo mão de uma ou mais destas restrições.
+Como estamos interessados em resolver instâncias grandes e gerais dos problemas, nossas abordagens de utilizar heurísticas e meta-heurísticas~\cite{glover2006handbook,talbi2009metaheuristics} envolvem vasculhar o espaço de busca a fim de encontrar boas soluções num tempo razoável, ainda que sem garantia de encontrar uma solução ótima.
+
+
+\subsection{Heurísticas}
+
+Heurística, na ciência da computação, é uma técnica computacional que visa  solucionar problemas de forma eficiente, em termos de uso de memória e tempo de processamento. No entando, em geral, algoritmos heurísticos produzem soluções sem dar garantias sobre a qualidade destas. Algumas técnicas de projeto de algoritmos que costumam produzir boas heurísticas são apresentadas a seguir:
+
+
+\paragraph{Algoritmos gulosos.} Um algoritmo guloso é aquele que constrói uma solução através de uma sequência de decisões míopes, ou seja, decisões que visam o melhor cenário de curto prazo, sem garantia de que isso levará ao melhor resultado global. Algoritmos gulosos são muito usados porque costumam ser rápidos e fáceis de implementar, além de em alguns casos ser possível mostrar que suas soluções apresentam alguma garantia de qualidade global. Algoritmos clássicos em grafos como Kruskal e Dijkstra fazem uso dessa técnica e obtém soluções ótimas. Na maioria das vezes, no entando, essas soluções não são ótimas, mas muitas delas são boas na prática. Algoritmos gulosos costumam ser usados para encontrar soluções viáveis para problemas difíceis. Chamamos estes de heurísticas construtivas.
+
+\paragraph{Busca local.} Os algoritmos de busca local, assim como os algoritmos gulosos, se baseiam em escolhas que obtém melhorias locais sem garantia de atingir um ótimo global. 
+Eles se diferenciam por começar com uma solução viável e, iterativamente, fazerem mudanças pequenas nesta solução, de modo a sempre transformá-la numa solução um pouco melhor.
+Como estas melhorias podem ser muito pequenas, estes algoritmos não necessariamente terminam em um número polinomial de iterações.
+Por isso, em geral um nível mínimo de melhoria a cada iteração ou número máximo de iterações são adotados como critérios de parada.\\ 
+
+Tanto heurísticas construtivas quanto algoritmos de busca local são utilizados na construção de heurísticas modernas, mais conhecidas como meta-heurísticas, como veremos na próxima subseção. 
+
+\subsection{Meta-Heurísticas}
+
+Estas são abordagens muito importantes para a resolução de problemas de otimização combinatória, como o problema do roteamento de veículos. Tratam-se de arcabouços gerais de regras formados a partir de um tema comum que podem servir de base para a construção de soluções aos mais diversos problemas computacionais. As regras são escolhidas de acordo com o tema, arbitrariamente, ou seguindo limites estabelecidos pela própria natureza do problema, por exemplo, leis físicas, químicas, regras socias. Assim, uma mesma meta-heurística é capaz de inspirar a criação de algoritmos para resolver problemas de áreas diversas. \\
+Para entender o funcionamento de algumas meta-heurísticas, precisamos entender o conceito de vizinhança entre soluções. Considere um grafo em que cada vértice é uma solução do problema e existe uma aresta entre dois vértices se as soluções correspondentes atendem a algum critério de similaridade. Entende-se por vizinhança o conjunto de vértices adjacentes ao vértice que está sendo analisado. Para trabalhar com o problema do roteamento de veículos, usaremos meta-heurísticas que utilizam os seguintes tipos de vizinhanças:  
+\begin{description}
+\item[Vizinhança Fixa.] A estrutura destas vizinhanças é definida no início do procedimento, permanecendo imutável ao longo da busca. Como exemplos de algoritmos que a utilizam temos as heurísticas de busca local e a meta-heurística GRASP.
+
+\item[Vizinhança Flexível.] A estrutura desta vizinhança pode ser excepcionalmente alterada, contudo de forma pouco sistemática ou mesmo aleatoriamente. Como exemplo de algoritmos que a utilizam temos a meta-heurística busca tabu.
+
+\item[Vizinhança Variável.] Esse tipo de vizinhança permite que algoritmos explorem sistematicamente várias estruturas de vizinhanças diferentes. Como exemplo desses algoritmos temos a meta-heurística de busca em vizinhança variável.
+\end{description}
+
+Os três tipos de meta-heurísticas citados anteriormente, são descritos a seguir.
+
+
+\paragraph{Busca em vizinhança variável} (ou VNS, do inglês {\textit{Variable Neighborhood Search}), é um método que explora múltiplas vizinhanças de uma solução, buscando melhorá-la através da heurística de busca local. Denomina-se busca em vizinhança variável, pois propõe explorar o espaço de busca variando sistematicamente a vizinhança. As que são mais eficientes para a aplicação considerada possuem maiores chances de utilização durante a execução do algoritmo. Mais precisamente, a VNS, primeiro determina uma solução que é ótimo local em uma vizinhança, então busca por melhorias em outra vizinhança, na esperança de se aproximar do ótimo global.
+
+\paragraph{Busca tabu}é assim denominada por empregar estratégias que permitem proibir certas ações ou movimentos de busca durante a escolha de soluções e exploração de vizinhanças, usando uma lista tabu. Esta meta-heurística tem como princípios criar uma busca eficiente evitando revisitar soluções. Para tanto, ela registra as alterações realizadas ao criar determinadas soluções, usando memórias de curto e médio prazo.  A memória de curto prazo é conhecida como lista de movimentos, uma lista que registra movimentos que levaram à formação da solução em foco. Parte dessa lista é a  lista tabu, responsável por armazenar movimentos proibidos. No algoritmo clássico, movimentos proibidos são aqueles que, ocorreram recentemente e que se fossem realizados novamente levariam a ciclos, e movimentos comprovadamente ineficientes. Mas a proibição é flexível, por exemplo, em determinadas ocasiões algum movimento da lista tabu pode levar a soluções boas. Se este for o caso, a restrição do movimento é retirada. A memória de médio prazo registra vizinhanças promissoras que foram descartadas por decisões locais do algoritmo e soluções de elite, isto é, as melhores soluções encontradas até então. 
+
+\paragraph{GRASP (\textit{Greedy Randomized Adaptive Search Procedure})}é uma meta-heurística formada por um procedimento construtivo e um procedimento de busca local. O procedimento construtivo é projetado por meio de uma estratégia gulosa aleatorizada. O GRASP busca obter, em sua primeira fase, soluções diversificadas e de melhor qualidade que soluções puramente aleatórias, lançando mão de diferentes estratégias. Uma das mais utilizadas é a estratégia semigulosa de Hart e Shogan \cite{hart1987semi}, na qual a clássica escolha gulosa determinística é substituída por um critério de escolha aleatória em um conjunto restrito definido por um critério guloso, que é chamado de Lista Restrita de Candidatos (LRC). A solução obtida na primeira fase é melhorada por uma busca local. Estes procedimentos são repetidos diversas vezes e em cada iteração  uma nova solução para o problema é obtida. No final escolhemos a melhor solução encontrada. O algoritmo é adaptativo, em função da maneira que a  LRC é atualizada. Na maioria dos algoritmos gulosos, a avaliação das variáveis candidatas a compor a solução é feita uma única vez e permanece imutável ao longo do processo construtivo. O critério guloso é, na maioria dos casos, insensível ao processo de formação da solução. Já no GRASP, o algoritmo adapta esses critérios de acordo com a solução encaminhada, evitando armadilhas e viéses em que o processo guloso puro costuma cair.
+
+
+\section{Objetivos}
+
+%\blue{inserir dados do problema nesta seção}\\%
+O objetivo principal deste projeto é o estudo do Problema do Roteamento de Veículos e de algumas de suas variantes, com foco em técnicas heurísticas e meta-heurísticas que se mostraram bem sucedidas em obter algoritmos interessantes para estes problemas.\\
+Algoritmos serão projetados utilizando algumas das técnicas estudadas e os mais promissores serão implementados e validados experimentalmente, usando instâncias da literatura científica.\\
+Além disso, esta iniciação científica irá introduzir o candidato a métodos de pesquisa e complementará sua formação em Ciência da Computação, aprofundando seu conhecimento em problemas de otimização combinatória, heurísticas, meta-heurísticas e técnicas de projeto e análise de algoritmos.
+
+
+
+\section{Plano de Trabalho e Cronograma}
+
+%\blue{Modificar seção para cada problema}\\
+Os primeiros quatro meses do projeto serão dedicados ao estudo de heurísticas gulosas e de busca local aplicáveis ao PRV, bem como ao desenvolvimento e implementação de algoritmos usando essas técnicas. Nos próximos quatro meses meta-heurísticas serão exploradas, como o GRASP, a \textit{Tabu Search} e a \textit{Variable Neighborhood Search}. Novamente, algoritmos serão projetados usando algumas dessas técnicas e o desempenho destes será avaliado empiricamente. Destacamos que as heurísticas produzidas anteriormente serão usadas nesta etapa.
+Finalmente, nos últimos quatro meses do projeto serão estudadas variantes do Problema do Roteamento de Veículos, como a com \textit{Pickup and Delivery} e com Dimensionamento de Frota. Nossa ideia é adaptar os algoritmos desenvolvidos anteriormente para essas variantes.\\
+
+
+%\noindent
+\begin{tabular}{ |l*{12}{|c}| }
+\hline
+\multirow{2}{*}{Atividades} & \multicolumn{12}{ |c| }{Meses} \\
+\cline{2-13}
+& ~1 & ~2 & ~3 & ~4 & ~5 & ~6 & ~7 & ~8 & ~9 & 10 & 11 & 12 \\ \hline
+Heurísticas & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ &&&&&&&&  \\ \hline
+Meta-Heurísticas &&&&& $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ &&&& \\ \hline
+Variantes do problema &&&&&&&&& $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$\\ \hline
+Implementação & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$\\ \hline
+\end{tabular}
+
+
+
+\section{Materiais e Métodos}
+
+%\blue{inserir dados do problema nesta seção}\\
+Durante o projeto, o candidato estudará resultados importantes relacionados ao Problema do Roteamento de Veículos, sendo o acesso a esses artigos fornecido gratuitamente pela UFSCar, além de livros sobre heurísticas e meta-heurísticas, disponibilizados pela biblioteca Comunitária e pelo orientador. 
+
+No decorrer do projeto serão realizadas reuniões quinzenais entre o candidato e o orientador para averiguar o andamento do mesmo, discutir os conteúdos estudados, além de estabelecer direções e metas. 
+
+
+
+%\bibliographystyle{plain}
+\bibliography{referencias}
+
+\end{document}

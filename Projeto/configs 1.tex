@@ -1,0 +1,107 @@
+% Configuracoes para uso em arquivos .tex
+
+
+
+% ------- %
+% Pacotes %
+% ------- %
+
+\usepackage{verbatim} % usar ambientes verbatim e comment
+\usepackage{amsmath} % reconhecer equa��es e nota��es matem�ticas
+\usepackage{amsthm} % usar ambiente proof. Remove this if using llncs
+\usepackage[utf8x]{inputenc} % reconhecer acentos e outros caracteres latinos
+\usepackage[brazil]{babel} % usar palavras em portugu�s
+
+
+
+
+% -------- %
+% Comandos para Escrita Matem�tica
+% -------- %
+
+\newcommand{\ical}{\ensuremath{\cal I}}
+\newcommand{\ocal}{\ensuremath{\cal O}}
+\newcommand{\scal}{\ensuremath{\cal S}}
+\newcommand{\pcal}{\ensuremath{\cal P}}
+\newcommand{\fcal}{\ensuremath{\cal F}}
+\newcommand{\ccal}{\ensuremath{\cal C}}
+\newcommand{\bcal}{\ensuremath{\cal B}}
+\newcommand{\mcal}{\ensuremath{\cal M}}
+
+\newcommand{\OPT}{\mathrm{OPT}}
+\newcommand{\ALG}{\mathrm{ALG}}
+\newcommand{\FL}{\mathrm{FL}}
+\newcommand{\OFL}{\mathrm{OFL}}
+\newcommand{\PFL}{\mathrm{PFL}}
+\newcommand{\OPFL}{\mathrm{OPFL}}
+\newcommand{\ST}{\mathrm{ST}}
+\newcommand{\OST}{\mathrm{OST}}
+\newcommand{\SRoB}{\mathrm{SRoB}}
+\newcommand{\OSRoB}{\mathrm{OSRoB}}
+\newcommand{\STS}{\mathrm{STS}}
+\newcommand{\OSTS}{\mathrm{OSTS}}
+\newcommand{\CFL}{\mathrm{CFL}}
+\newcommand{\OCFL}{\mathrm{OCFL}}
+\newcommand{\compFL}{\mathrm{compFL}}
+\newcommand{\compST}{\mathrm{compST}}
+%\newcommand{\path}{\mathrm{path}}
+\newcommand{\closest}{\mathrm{closest}}
+\newcommand{\edge}{\mathrm{edge}}
+\newcommand{\Null}{\mathrm{null}}
+\newcommand{\Orm}{\mathrm{O}}
+\newcommand{\Omegarm}{\mathrm{\Omega}}
+
+\newcommand{\core}{\mathrm{core}}
+\newcommand{\ext}{\mathrm{ext}}
+\newcommand{\Star}{\mathrm{star}}
+\newcommand{\phase}{\mathrm{phase}}
+
+\newcommand{\Dm}{D^m} % marked clients
+\newcommand{\Fa}{F^a} % actual facilities, i.e. facilities opened by the OCFL alg.
+\newcommand{\Fv}{F^v} % virtual facilities, i.e. facilities opened by the OFL alg. used by OCFL alg.
+\newcommand{\DN}{D^N} % clients in some neighbourhood
+\newcommand{\DnN}{\overline{D^{N}}} % clients not in any neighbourhood
+\newcommand{\Dp}{D^p} % clients that are connected
+\newcommand{\Dc}{D^c} % clients that paid penalty
+\newcommand{\dDp}{\bar D^p} % penalty clients that are close to a facility
+\newcommand{\pDp}{\tilde D^p} % penalty clients that are far from any facility
+
+% w(i) = j means that j witnessed the actual opening of i
+% p(j) = i means that i is the provider facility to client j
+% a(j) = i means that i is the actual facility that client j is connected with
+% v(j) = i means that i is the virtual (compFL) facility that client j is connected with 
+
+
+
+% ------------------------------- %
+% Comandos para escrita de c�digo %
+% ------------------------------- %
+
+\newcommand{\law}{\ensuremath{\leftarrow}}
+\newcommand {\raw}{\rightarrow}
+
+%\newcommand{\x}{\hspace*{1em}}
+%\newcommand{\xa}{\hspace*{2.5ex}}
+%\newcommand{\xx}{\xa\xa}
+%\newcommand{\xxx}{\xa\xx}
+%\newcommand{\xxxx}{\xa\xxx}
+%\newcommand{\xxxxx}{\xa\xxxx}
+%\newcommand{\xxxxxx}{\xa\xxxx}
+%\newcommand{\xxxxxxx}{\xa\xxxx}
+
+
+
+% -------- %
+% Teoremas e provas%
+% -------- %
+
+%% remove these if using llncs
+\newtheorem {theorem}{Theorem} [section]
+\newtheorem {lemma}{Lemma} [section]
+\newtheorem {corollary}{Corollary} [section]
+\newtheorem {definition}{Definition} [section]
+
+%\newenvironment{demo}{\begin{proof}}{\qed \end{proof}}
+\newenvironment{demo}{\begin{proof}}{\end{proof}}
+
+

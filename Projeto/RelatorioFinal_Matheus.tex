@@ -1,0 +1,717 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[verbose,left=25mm,right=25mm,top=35mm,bottom=30mm]{geometry}
+\usepackage[Algoritmo]{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{amsmath, amssymb, mathtools}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+\usepackage{xcolor}
+
+\usepackage{graphicx}
+
+\usepackage{multirow}
+%\geometry{right=2cm,left=2cm,bottom=2.5cm,top=2.5cm}
+
+\sloppy
+\allowdisplaybreaks
+
+\input{configs.tex}
+
+\newtheorem{prop}{Proposição}[section]
+\newtheorem{teo}{Teorema}[section]
+\newtheorem{defi}{Definição}[section]
+\newtheorem{lema}{Lema}[section]
+
+\begin{document}
+
+\begin{titlepage}
+	\begin{center}
+    	\large{Universidade Federal de São Carlos}\\
+    	\vspace{65pt}
+    	\vspace{35pt}
+    	\large{Processo FAPESP \#2020/06103-0}\\ 
+        \vspace{95pt}
+        \textbf{\LARGE{Heurísticas e Meta-Heurísticas para Problemas de Roteamento de Veículos}}\\
+        \vspace{0,5cm}
+        \textbf{Relatório Final}\\
+        \vspace{2,5cm}
+        Orientador: Prof. Dr. Mário César San Felice
+            
+        Bolsista: Matheus Teixeira Mattioli
+    	\vspace{2,5cm}
+	\end{center}
+	
+	\begin{flushleft}
+		\begin{tabbing}
+			
+	\end{tabbing}
+ \end{flushleft}
+	\vspace{1cm}
+	
+	\begin{center}
+		\vspace{\fill}
+		 Agosto de 2020 a Julho de 2021\\
+		 São Carlos - SP, Brasil
+			\end{center}
+\end{titlepage}
+
+\newpage
+\tableofcontents
+\thispagestyle{empty}
+\newpage
+
+
+
+\section{Introdução} \label{sec:introduction}
+%\blue{Apresentação intuitiva do problema.}\\
+Em problemas de otimização combinatória existem grandes quantidades de escolhas a serem tomadas, que podem levar a muitas soluções distintas e o objetivo é alcançar uma solução cujo valor é mínimo ou máximo. Um exemplo deste tipo de problema é a tarefa de traçar rotas de custo mínimo para uma determinada frota de veículos. Este problema é conhecido como Problema do Roteamento de Veículos (Vehicle Routing Problem - VRP) e foi o objeto de estudos desta iniciação científica.
+
+
+%\blue{Relevância prática e motivação para o problema.}\\
+O VRP é uma generalização do Problema do Caixeiro Viajante (TSP), porém,  
+o VRP apresenta mais complicações que o TSP, já que pode levar em consideração fatores como capacidade dos veículos da frota, emissão de poluentes, janelas de tempo no atendimento de clientes, frotas heterogêneas, entre outras variantes. Essas variantes permitem que nos aproximemos mais de problemas da vida real, oriundos da área de logística e de outras partes da indústria.
+
+%\blue{Dificuldade e interesse teórico do problema (NP-Difícil).}\\
+Segundo Vidal, Laporte e Matl \cite{vidal2020concise} o VRP é um problema computacionalmente muito desafiador para métodos exatos e aproximativos. Parte disso pelo fato dele ser NP-difícil, ou seja, não poder ser resolvido de forma ótima em tempo polinomial a menos que P$=$NP. Por conta desta dificuldade, muitos pesquisadores que estudam o VRP passaram a dar um foco maior a heurísticas e meta-heurísticas, conforme indica Laporte \cite{laporte2009fifty}. 
+
+Em decorrência disso, diversos algoritmos heurísticos e meta-heurísticos são conhecidos para ele.
+%
+Por exemplo, a heurística construtiva Nearest Neighbour \cite{joshi2015nearest}; heurísticas de intensificação como a busca local, a qual pode ser trabalhada com diversas estruturas de vizinhança, como k-opt, swap e shift, conforme indica Munhoz et. al~\cite{munhoz2018general}.
+%
+Com relação às meta-heurísticas, segundo Thibaut et. al~\cite{vidal2013heuristics}, várias já foram testadas e obtiveram resultados interessantes, tais como, Greedy Randomized Adaptative Search Procedure (GRASP), Simulated Annealing, Tabu Search, Variable Neighbourhood Search (VNS) e Variable Neighbourhood Descent (VND).
+
+Neste projeto também trabalhamos com a versão capacitada do problema de roteamento de veículos (CVRP), em que os veículos apresentam uma capacidade máxima de carga \cite{eksioglu2009vehicle}.
+Também estudamos uma versão verde bi-objetiva do VRP, chamada de roteamento de veículos verde (GVRP), na qual devemos minimizar custos operacionais e emissões de poluentes \cite{lin2014survey}.
+
+%\blue{Objetivos de formação}\\
+
+Neste relatório, são apresentadas brevemente as atividades desenvolvidas na primeira etapa do projeto, de agosto de 2020 a janeiro de 2021, e apresentadas mais detalhadamente as atividades realizadas na segunda etapa, de fevereiro de 2021 a julho de 2021. Também são descritas as atividades propostas para as próximas etapas, que envolvem o pedido de extensão da bolsa. A Seção~\ref{sec:problem} contém a definição do VRP, bem como a descrição das variantes estudadas. Na Seção~\ref{sec:algorithms_TSP} são descritos os algoritmos estudados para abordar o TSP. A Seção \ref{sec:algorithms_VRP} apresenta uma estratégia heurística de resolução do CVRP. A Seção \ref{sec:algorithms_GVRP} apresenta uma técnica de geração de fronteiras de pareto para o GVRP. Na Seção~\ref{sec:metaheuristics} são descritas as meta-heurísticas estudadas para o VRP. A Seção~\ref{sec:implementation} descreve a implementação feita de alguns dos algoritmo estudados. Na Seção \ref{sec:resultados} são apresentados os resultados experimentais obtidos. A Seção \ref{sec:pror} trata do pedido de renovação de bolsa e apresenta o planejamento para as próximas etapas do projeto. A Seção \ref{sec:cronograma} corresponde ao cronograma atualizado do projeto. Por fim, a Seção \ref{sec:conclusao} traz a conclusão.
+
+
+\section{Definição do Problema} \label{sec:problem}
+
+O objetivo no VRP é formar rotas para que os veículos possam transportar as demandas, respeitando as restrições operacionais e buscando minimizar os custos envolvidos. No VRP, cada rota deve iniciar no depósito e terminar no mesmo, sendo cíclica. Como dito anteriormente, no CVRP temos de respeitar a capacidade dos veículos. A seguir apresentamos uma formulação em programação linear inteira (PLI) para o CVRP, que é baseada na formulação de Fisher e Jaikumar~\cite{fisher1981generalized}. Consideramos um grafo não direcionado $G = (V, E)$ com $n$ vértices, $m$ arestas e $h$ veículos. Esta formulação supõe que o depósito está no vértice com índice 1 e utiliza as seguintes varíaveis e constantes:
+%
+\begin{itemize}
+\item $x_{ijk}$ é uma variável binária que assume valor 1 quando o veículo $k$ visita o cliente $j$ imediatamente após visitar o cliente $i$, 0 caso contrário.
+\item $y_{ik}$ é uma variável binária que assume valor 1 se o cliente $i$ é visitado pelo veículo $k$, 0 caso contrário.
+\item $q_{i}$ é a demanda do cliente $i$.
+\item $Q_{k}$ é a capacidade do veículo $k$.
+\item $c_{ij}$ é o custo de percorrer o trecho que vai do cliente $i$ ao $j$.
+\end{itemize}
+
+O problema pode ser formulado como segue:
+\begin{align}
+\min & \sum\limits_{i,j}\left(c_{ij}\sum\limits_{k=1}^{h}x_{ijk}\right) & \nonumber \\
+%
+\text{s.a.} & \sum\limits_{k=1}^{h}y_{ik}=1 & \qquad i=2,\dots,n \label{vrp_1}\\
+%
+& \sum\limits_{k=1}^{h}y_{1k} = h & \label{vrp_2}\\
+%
+& \sum\limits_{i=2}^{n}q_{i} y_{ik} \leqslant Q_{k} & \qquad k=1,\dots,h \label{vrp_3}\\
+%
+& \sum\limits_{j\neq i}x_{ijk} = \sum\limits_{j\neq i}x_{jik} = y_{ik} & \qquad i=2,\dots,n \qquad k=1,\dots,h \label{vrp_4}\\
+%
+& \sum\limits_{i,j \in S}x_{ijk} \leqslant |S|-1 & \qquad \forall S\subseteq\lbrace2,\dots,n\rbrace ,\quad k=1,\dots,h \label{vrp_5}\\
+%
+& y_{ik} \in \lbrace 0,1 \rbrace & \qquad i=1,\dots,n \quad k=1,\dots,h \label{vrp_6}\\
+%
+& x_{ijk} \in \lbrace 0,1 \rbrace & \qquad i,j=1,\dots,n \quad k=1,\dots,h \label{vrp_7}
+\end{align}
+%
+A restrição~\eqref{vrp_1} assegura que cada cliente é visitado por exatamente um veículo, a restrição \eqref{vrp_2} garante que todos os veículos visitam o depósito, a restrição \eqref{vrp_3} evita que a capacidade dos veículos seja ultrapassada, as restrições \eqref{vrp_4} garantem que os veículos não param suas rotas em um cliente e conectam as variáveis $x$ e $y$, e a restrição \eqref{vrp_5} elimina subrotas.
+Para o PLI descrito acima se aplicar para o VRP basta removermos a restrição 3.
+
+A variante bi-objetiva GVRP também foi estudada durante este projeto. Nela queremos construir rotas que minimizem tanto a distância percorrida, quanto a emissão de poluentes \cite{jemai2012nsga}. No caso, a emissão é representada por fatores de poluição atrelados a cada aresta do grafo.
+
+
+\section{Algoritmos para o TSP}\label{sec:algorithms_TSP}
+
+Vale notar que podemos encontrar soluções para o VRP usando algoritmos para seu caso particular, o TSP, se considerarmos que podemos utilizar um veículo da frota para atender todas as demandas.  Além disso, mesmo quando tratamos do CVRP ou outras variantes mais complexas, algoritmos para o TSP podem ser subrotinas importantes para a construção das soluções.
+
+
+\subsection{Algoritmo Guloso}\label{subsec:algguloso}
+
+Um algoritmo guloso trabalhado é baseado no \textit{nearest neighbor} apresentado no artigo de Rosenkrantz et. al~\cite{rosenkrantz1977analysis}. A ideia principal por trás dele é a inserção do vizinho mais próximo. O nosso algoritmo é adaptado para o VRP, portanto, insere na primeira posição da lista $L$ o depósito $d$, a partir daí, sendo $C$ o conjunto de clientes que ainda não foram atendidos, o algoritmo seleciona o cliente $c$ mais próximo do último cliente em $L$, que chamamos $l_{ultimo}$, o remove do conjunto $C$ e o insere no final de $L$. O algoritmo continua até que não restem clientes em $C$. Ao final, adicionamos uma aresta conectando o último cliente visitado e o depósito, obtendo uma lista que mostra a ordem de visitação de todos os clientes, partindo e terminando no depósito. O pseudocódigo desse algoritmo guloso é mostrado no Algoritmo~\ref{alg:nearestNeighbor}.\par 
+%
+\begin{algorithm}[htb!]
+  \caption{TSP-Guloso}\label{alg:nearestNeighbor}
+  \begin{algorithmic}[1]
+    \Require{Um grafo conexo $G=(C,E)$}
+    \Ensure{$L$, a lista contendo os clientes na ordem a serem visitados}
+    \Function{TSP-Guloso}{$G=(C,E)$, $w$, $d$}
+      \State $L \gets d$
+      \While{$C \neq \emptyset$}
+        \State Encontre o cliente $c \in C$ mais próximo de $l_{ultimo}$
+        \State $L\gets L \cup \left\{c\right\}$
+        \State Remova $c$ do conjunto $C$
+       \EndWhile
+      \State $L \gets L \cup \left\{ d \right\}$ 
+      \State \textbf{return} $L$
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+
+\subsection{Algoritmo Aleatorizado}
+
+Algoritmo para geração de circuitos aleatórios baseado no Knuth \textit{Shuffle}\cite{knuth2014art}. A ideia é colocar todos os clientes em uma lista e gerar uma permutação aleatória dela. A partir disso inserimos duas arestas, que conectam o primeiro cliente da lista com o depósito e o último cliente da lista com o depósito. Seu pseudocódigo é apresentando em Algoritmo~\ref{knuth}. 
+%
+\begin{algorithm}[htb!]
+  \caption{KnuthShuffle}\label{knuth}
+  \begin{algorithmic}[1]
+    \Require{Um vetor $V$ contendo todos os clientes $C$}
+    \Ensure{$L$, uma permutação aleatória do vetor original, contendo a ordem dos clientes a serem visitados, com o depósito no início e final da permutação}
+    \Function{KnuthShuffle}{$V$}
+      \For{\texttt{$i\gets 1$ to $|C|$}}
+        \State Escolha um índice $j$ com probabilidade uniforme entre $i$ e $|C|$
+        \State Troque de posição o valor da posição $i$ com o da posição $j$
+      \EndFor
+      \State Insira o depósito no começo e final do vetor $L$
+      \State \textbf{return} $L$
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+
+\subsection{Busca Local}
+
+Antes de apresentar a Busca Local é muito importante definir o conceito de vizinhança de soluções ou soluções vizinhas: consideremos um grafo em que cada vértice é uma solução do problema e existe uma aresta entre dois vértices se as soluções correspondentes atendem a algum critério de similaridade. Entende-se por vizinhança o conjunto de vértices adjacentes ao vértice que está sendo analisado.
+
+Podemos dizer que os algoritmos de busca local se baseiam em escolhas que obtêm melhorias locais sem garantia de atingir um ótimo global. Eles começam recebendo uma solução viável e, iterativamente, fazem mudanças pequenas nesta solução através da análise de soluções vizinhas, de modo a sempre transformá-la numa solução um pouco melhor. A escolha de solução vizinha segue algum critério, como \textit{Best Fit} ou \textit{First Fit}. No primeiro, a cada iteração escolhemos a solução vizinha que oferece a melhor melhoria possível. No segundo escolhemos a primeira solução encontrada que oferece melhoria. Como as melhorias promovidas a cada iteração podem ser muito pequenas, estes algoritmos não necessariamente terminam em um número polinomial de iterações. Por isso, em geral um nível mínimo de melhoria a cada iteração ou número máximo de iterações são adotados como critérios de parada. Nos Algoritmos~\ref{LSBF} e~\ref{LSFF} são apresentados pseudocódigos da busca local \textit{Best Fit} e \textit{First Fit}, respectivamente.\par
+%
+\begin{algorithm}[htb!]
+  \caption{LS-BestFit}\label{LSBF}
+  \begin{algorithmic}[1]
+    \Require{Solução inicial $S$}
+    \Ensure{Devolve um mínimo local $S^*$}
+      \State $S^* \gets S$
+      \While{Critério de parada não atingido}
+        \State Analise a vizinhança de $S^*$ e devolva seu melhor vizinho $S'$
+             \If {$S'$ for melhor que $S^*$} 
+	       \State $S^* \gets S'$
+	  \EndIf
+      \EndWhile
+      \State \textbf{return} $S^*$
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[htb!]
+  \caption{LS-FirstFit}\label{LSFF}
+  \begin{algorithmic}[1]
+    \Require{Solução inicial $S$}
+    \Ensure{Retorna um mínimo local $S^*$}
+      \State $S^* \gets S$
+      \While{Critério de parada não atingido}
+        \State Analise a vizinhança de $S^*$ até encontrar o primeiro vizinho $S'$ melhor que $S^*$
+        \State $S*\gets S'$
+      \EndWhile
+      \State \textbf{return} $S^*$
+  \end{algorithmic}
+\end{algorithm}
+
+
+\subsubsection{2-OPT}
+
+Para a busca local funcionar, ela deve explorar uma estrutura de vizinhanças com o objetivo de encontrar a melhor solução vizinha, best fit, ou a primeira solução que melhora, first fit. Para isso, uma estrutura de vizinhança possível é a chamada de 2-OPT, na qual realizamos uma troca entre duas arestas selecionadas, explicitada pelas imagens \ref{fig:org} e \ref{fig:2-opt}
+
+\begin{figure}[htb!]
+\centering
+\includegraphics[scale=0.7]{grafo_original.png}
+\caption{Ilustração de uma possível solução inicial para um VRP. O vértice 0 representa o depósito.}
+\label{fig:org}
+\end{figure}
+
+\begin{figure}[htb!]
+\centering
+\includegraphics[scale=0.7]{grafo_2opt.png}
+\caption{Um vizinho 2-OPT da solução inicial. Onde houve a troca das arestas E(0, 1) e E(4, 5) pelas arestas E(0, 5) e E(1, 4). O vértice 0 representa o depósito.}
+\label{fig:2-opt}
+\end{figure}
+
+Todas as combinações possíveis desta troca entre duas arestas no circuito são realizadas por meio de um laço externo que seleciona uma aresta por iteração, e testamos as possibilidades de troca desta aresta com todas as outras $m - 1$ arestas através de um laço interno. O laço externo é executado por $m$ iterações. Como, ao total, temos $m(m - 1)/2$ combinações de arestas para testarmos na solução, temos este mesmo tanto de soluções vizinhas à serem analisadas. Portanto, o custo deste algoritmo é de O($m^2$), mas o grafo é completo, o que implica em uma complexidade O($n^2$), com n sendo o número de vértices.
+
+
+\subsubsection{3-OPT}
+
+A estrutura de vizinhança 3-OPT trabalha com a troca entre três arestas de uma solução inicial, as imagens \ref{fig:org2}, \ref{fig:3opt1}, \ref{fig:3opt2} e \ref{fig:3opt3}  mostram todas as possiblidades de troca.
+
+\begin{figure}[htb!]
+\centering
+\includegraphics[scale=0.7]{grafo_original.png}
+\caption{Ilustração de uma possível solução inicial para um VRP. O vértice 0 representa o depósito.}
+\label{fig:org2}
+\end{figure}
+
+\begin{figure}[htb!]
+\centering
+\includegraphics[scale=0.7]{3opt1.png}
+\caption{Um possível vizinho 3-OPT da solução inicial. Em que as arestas E(0, 1), E(6, 5) e E(4, 3), foram substituídas pelas arestas E(0,5), E(4, 6) e E(1, 3).}
+\label{fig:3opt1}
+\end{figure}
+
+\begin{figure}[htb!]
+\centering
+\includegraphics[scale=0.7]{3opt2.png}
+\caption{Um possível vizinho 3-OPT da solução inicial. Em que as arestas E(0, 1), E(6, 5) e E(4, 3), foram substituídas pelas arestas E(0,6), E(1, 4) e E(5, 3).}
+\label{fig:3opt2}
+\end{figure}
+
+\begin{figure}[htb!]
+\centering
+\includegraphics[scale=0.7]{3opt3.png}
+\caption{Um possível vizinho 3-OPT da solução inicial. Em que as arestas E(0, 1), E(6, 5) e E(4, 3), foram substituídas pelas arestas E(0,4), E(5, 1) e E(6, 3).}
+\label{fig:3opt3}
+\end{figure}
+
+Todas as combinações possíveis da troca entre três arestas no circuito são realizadas por meio de três laços aninhados. O que configura uma complexidade de O($m^3$), porém o grafo é completo e podemos escrever em ordem do número de vértices, portanto O($n^3$). \par
+Para essas estruturas de vizinhança k-OPT, com $k$ sendo o número de arestas trocadas. Vale destacar que, conforme aumentamos o número de arestas fixadas para serem trocadas, cresce o número de vizinhos da estrutura de vizinhança e a probabilidade de encontrarmos uma solução vizinha que melhore bastante a qualidade da solução inicial. Contudo, com mais arestas analisadas, o tempo consumido em uma execução do algoritmo aumenta, pois a ordem da função de crescimento sobe de categoria, por exemplo da 2-OPT para a 3-OPT, passamos de O($n^2$) para O($n^3$). Em uma 4-OPT podemos obter resultados mais expressivos, porém o preço a pagar é de O($n^4$).
+
+\subsubsection{Vizinhanças Swap e Shift}
+
+Essas duas estruturas de vizinhança são alternativas as apresentadas anteriormente. A estrutura 2-Swap seleciona 2 vértices da solução inicial e simplesmente inverte suas posições, que é uma operação feita em tempo constante, O(1), mas testando-se para todas as combinações de dois vértices, leva tempo O($n^2$), com $n$ sendo o número de vértices. Como exemplo, considere a lista inicial $\left\{0, 1, 2, 3, 4, 5\right\}$, um movimento 2-Swap entre os vértices $0$ e $3$ leva à lista $\left\{3, 1, 2, 0, 4, 5\right\}$.
+
+A estrutura 2-Shift realiza um movimento de deslocamento de duas posições para a direita em um vértice selecionado. É bem eficiente, pois basta percorrer todos os vértices $n$, O(n), e realizar um deslocamento de duas posições, que é uma operação bem barata, levando à complexidade O(n). Por exemplo, vamos utilizar a mesma lista anterior, se fizermos um 2-Shift no vértice 0, obtemos $\left\{1, 2, 0, 3, 4, 5\right\}$. 
+
+As duas estruturas ofertam movimentos distintos da vizinhança 2-OPT, e são mais eficientes que a 3-OPT, o que leva à oportunidades distintas na hora de implementar buscas locais com múltiplas estruturas de vizinhança.
+
+\section{Algoritmos de Clusterização para o CVRP}\label{sec:algorithms_VRP}
+
+Para trabalhar com o CVRP, estudamos a técnica da clusterização. Nela formamos uma partição do conjunto de clientes, onde cada parte pode ser atendida por um veículo da frota levando em consideração a capacidade dos veículos. Dessa forma, reduzimos o CVRP a diversos subproblemas do TSP. Então usamos algoritmos que resolvem o TSP, para formar rotas entre clientes de cada parte e o depósito. 
+
+Existem várias implementações para esta técnica. Uma delas é a ideia de formar aglomerados ao redor de vértices iniciais selecionados por algum critério, como a aleatoriedade. Esses vértices são chamados centros de \textit{cluster}. A partir dessa seleção, verificamos de qual centro cada cliente está mais perto, o inserindo no \textit{cluster} do mesmo. O \textit{cluster} estará completo quando nenhum cliente couber na capacidade $W$ dos veículos da frota. O algoritmo termina quando todos os clientes são inseridos em algum cluster. Ao final, obtemos uma partição que divide os clientes entre os veículos da frota. O pseudocódigo dessa ideia pode ser visto no Algoritmo \ref{alg:clust1}.
+%
+\begin{algorithm}[htb!]
+  \caption{Clusterização com centros em Paralelo}\label{alg:clust1}
+  \begin{algorithmic}[1]
+    \Require{Um grafo conexo $G=(C,E)$, a capacidade $W$ da frota e a quantidade $T$ de veículos da frota}
+    \Ensure{$P$, um conjunto de partições $P'$ do conjunto $C$ respeitando a capacidade $W$ dos veículos}
+    \Function{paralelo}{$G=(C,E)$, $W$, $T$}
+     \For{\texttt{$i = 1$ até $T$}}
+	\State $c \gets random(C)$
+	\State $P'_i \gets \left\{c\right\}$
+	\State Remova $c$ do conjunto $C$
+      \EndFor
+      \While{$C \neq \emptyset$}
+       	\State Selecione um cliente $c \in C$ e encontre o centro de \textit{cluster} da partição $P'_i$ mais próximo
+        	 \State $P'_i\gets P'_i \cup \left\{c\right\}$
+	 \State Remova $c$ do conjunto $C$
+       \EndWhile
+        \State $P \gets \emptyset$
+        \For{\texttt{$i = 1$ até $T$}}
+	\State $P\gets P \cup \left\{P'\right\}$
+       \EndFor
+      \State \textbf{return} $P$
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+Outra ideia para algoritmo de clusterização é a construção de uma parte por rodada do algoritmo, por meio do algoritmo caminho guloso, que é uma adaptação do \textit{Nearest Neighbor}. Primeiro selecionamos aleatoriamente um cliente $c$ do conjunto $C$ para ser o início do \textit{cluster}. A partir disso, adicionamos o cliente mais próximo do cliente que está sendo analisado atualmente. O pseudocódigo dessa abordagem é mostrado no Algoritmo~\ref{alg:clust2}.
+%
+\begin{algorithm}[htb!]
+  \caption{Caminho Guloso}\label{alg:clust2}
+  \begin{algorithmic}[1]
+    \Require{Um grafo conexo $G=(C,E)$ e a capacidade $W$ da frota}
+    \Ensure{$P$, uma parte do conjunto $C$ respeitando a capacidade $W$ dos veículos}
+    \Function{caminhoGuloso}{$G=(C,E)$, $W$}
+      \State $P \gets random(C)$
+      \While{$C \neq \emptyset$ ou $w(P) \leq W$}
+        \State Encontre o cliente $c \in C$ mais próximo de $P_{ultimoInserido}$
+        \State $P\gets P \cup \left\{c\right\}$
+        \State Remova $c$ do conjunto $C$
+       \EndWhile
+      \State \textbf{return} $L$
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+
+\section{Algoritmo de Geração de Pesos para o GVRP}\label{sec:algorithms_GVRP}
+
+Com relação ao GVRP, por ser um problema multi-objetivo, utilizamos um método de geração de pesos, a fim de gerar várias soluções para popular a fronteira de pareto. Essa fronteira corresponde ao conjunto de soluções que não são dominadas por nenhuma outra solução do conjunto de soluções.
+
+Então, adaptamos nossas heurísticas e meta-heurísticas. Isso foi feito através do algoritmo para geração de pesos, o qual se utiliza da estrutura de dados fila. Nele, no começo resolvemos o problema com um esquema de pesos $p_1$ e $p_2$, que valem respectativamente $[1, 0]$ e $[0, 1]$ e inserimos essa dupla na primeira posição da fila. Depois, no primeiro laço do algoritmo retiramos esse esquema de pesos da fila e calculamos um novo valor $p_3$ que é a média de $p_1$ e $p_2$, resolvemos o problema com esse novo valor e inserimos na fila duas novas duplas de pesos, que se tratam de [$p_1$, $p_3$] e [$p_2$, $p_3$]. O algoritmo segue até que um critério de parada seja alcançado, como por exemplo, número de soluções que queremos obter.  O pseudocódigo se encontra em Algoritmo \ref{alg:pesos}.
+%
+\begin{algorithm}[htb!]
+  \caption{Algoritmo de geração de pesos}\label{alg:pesos}
+  \begin{algorithmic}[1]
+    \Require{$p_1$, $p_2$}
+    \Ensure{Conjunto de soluções $S$}
+    \Function{geradorPesos}{}
+	\State $S \gets S \cup \left\{resolvaGVRP(p_1), resolvaGVRP(p_2)\right\}$
+	\State Insira [$p_1$, $p_2$] na fila
+      \While{Critério de parada não atingido}
+       	\State Retire um esquema de peso da fila
+	\State $p_3 \gets (p_1 + p_2) / 2$
+	\State $S \gets S \cup \left\{resolvaGVRP(p_3)\right\}$
+	\State Insira [$p_1$, $p_3$] na fila
+	\State Insira [$p_2$, $p_3$] na fila
+       \EndWhile
+      \State \textbf{return} $S$
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+
+\section{Metaheurísticas}\label{sec:metaheuristics}
+
+Nesta seção são apresentadas metaheurísticas estudadas, algumas das quais foram implementadas para os problemas abordados.
+
+\subsection{Multistart}
+
+A meta-heurística \textit{Multistart}, também conhecida como reinício aleatório, funciona por meio da combinação de soluções iniciais aleatórias com uma heurística de busca local. O objetivo é explorar melhor o espaço de soluções para o problema, porém, mantendo a característica das heurísticas de resolver instâncias em tempo hábil e sem garantias do ótimo. Para isso, o critério de parada pode ser implementado de várias formas, como: um limite de iterações ou quantidade de iterações sem melhoria na qualidade da melhor solução já encontrada. O pseudocódigo do \textit{Multistart} é apresentado no Algoritmo \ref{alg:multistart}.\par
+%
+\begin{algorithm}[htb!]
+  \caption{Multistart}\label{alg:multistart}
+  \begin{algorithmic}[1]
+    \Require{Uma entrada $I$}
+    \Ensure{Retorna um mínimo local $S^*$}
+    \Function{Multistart}{I}
+      \While{Critério de parada não atingido} 
+       \State $S \gets$ solucaoaleatoria($I$)
+       \State $S \gets buscalocal(S)$ 
+ 	  \If {$S$ for melhor que $S^*$} 
+	      \State $S^* \gets S$
+	  \EndIf
+      \EndWhile
+      \State \textbf{return} $S^*$
+      \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+\subsection{Recozimento Simulado}
+
+O Recozimento Simulado, do inglês \textit{Simulated Annealing}, funciona por meio de decisões aleatórias e uma função de aceitação do vizinho baseada em um Cronograma de Recozimento. Mais especificamente, a cada iteração uma solução analisa toda sua vizinhança e escolhe alguma solução vizinha de forma aleatória. Se a temperatura estiver alta, a probabilidade de aceitação de uma solução que piore a qualidade da solução é maior. Conforme a temperatura abaixa, essa probabilidade diminui e o algoritmo toma comportamento parecido com o de uma busca local simples. O Cronograma de Recozimento decide como a temperatura é reduzida ao longo das iterações. Um pseudocódigo para esse método é apresentado no Algoritmo~\ref{alg:SA}.
+%
+\begin{algorithm}[htb!]
+  \caption{Simulated Annealing}\label{alg:SA}
+  \begin{algorithmic}[1]
+    \Require{Uma solução inicial $S$}
+    \Ensure{Retorna um mínimo local $S^*$}
+    \Function{SimulatedAnnealing}{S}
+      \State $S^* \gets S$
+      \While{Critério de parada não atingido} 
+       \State $S' \gets$ solucaoVizinhaAleatoria($S$)
+ 	   \If {$S$ for melhor que $S^*$} 
+	      \State $S^* \gets S$
+	   \Else
+	   	  \If {$temperatura > 0$}
+		   	  \State Decida por meio da temperatura se $S^* \gets S$
+	   	  \EndIf
+	   \EndIf
+      \EndWhile
+      \State \textbf{return} $S^*$
+      \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+\subsection{Busca Tabu}
+
+A Busca Tabu é assim denominada por empregar estratégias que proibem certas ações ou movimentos de busca durante a exploração de vizinhanças. Essa meta-heurística tem como princípios criar uma busca eficiente evitando revisitar soluções. Para tanto, ela registra as alterações realizadas ao criar determinadas soluções, usando memórias de curto e médio prazo.  A memória de curto prazo é conhecida como lista de movimentos, uma lista que registra movimentos que levaram à formação da solução em foco. Parte dessa lista é a  lista tabu, responsável por armazenar movimentos proibidos. No algoritmo clássico, movimentos proibidos são aqueles que ocorreram recentemente e que, se fossem realizados novamente, levariam a ciclos e movimentos comprovadamente ineficientes. Mas a proibição é flexível, pois, em determinadas ocasiões algum movimento da lista tabu pode levar a soluções boas. Se este for o caso, a restrição do movimento é ignorada. A memória de médio prazo registra vizinhanças promissoras que foram descartadas por decisões locais do algoritmo e soluções de elite, isto é, as melhores soluções encontradas até então. A imagem \ref{fig:tabu} ilustra o comportamento que a lista tabu trás ao algoritmo.
+%
+\begin{figure}[htb!]
+\centering
+\includegraphics[scale=0.7]{tabu_list.jpg}
+\caption{Neste gráfico, de solução viável por custo da solução, considere que o problema seja de minimização. A bolinha amarela é a solução corrente, as laranjas são mínimos locais, a verde é o mínimo global e a azul se trata da solução inicial, já a linha laranja se trata de todas as soluções que estão na lista tabu, elas são tabu pois, apesar de melhorarem o custo da solução, elas nos levam em um mínimo local que queremos escapar. Por questões de eficiência na implementação, a lista tabu não armazena soluções inteiras, apenas as trocas que levam até elas. A imagem foi retirada do artigo de Ibarra-Rojas et. al \cite{ibarra2015planning}.}
+\label{fig:tabu}
+\end{figure}
+
+
+\subsection{GRASP}
+
+O GRASP, do inglês \textit{Greedy Randomized Adaptive Search Procedure}, é uma meta-heurística formada por um procedimento construtivo e um procedimento de busca local. O procedimento construtivo é projetado por meio de uma estratégia gulosa aleatorizada. O GRASP busca obter, em sua primeira fase, soluções diversificadas e de melhor qualidade que soluções puramente aleatórias, lançando mão de diferentes estratégias. Uma das mais utilizadas é a estratégia semigulosa de Hart e Shogan \cite{hart1987semi}, na qual a clássica escolha gulosa determinística é substituída por um critério de escolha aleatória em um conjunto restrito definido por um critério guloso, que é chamado de Lista Restrita de Candidatos (LRC). A solução obtida na primeira fase é melhorada por uma busca local. Estes procedimentos são repetidos diversas vezes e em cada iteração  uma nova solução para o problema é obtida. No final escolhemos a melhor solução encontrada. O algoritmo é adaptativo, pois a  LRC é atualizada ao longo das iterações. Na maioria dos algoritmos gulosos, a avaliação das variáveis candidatas a compor a solução é feita uma única vez e permanece imutável ao longo do processo construtivo. Assim, o critério guloso é, na maioria dos casos, insensível ao processo de formação da solução. Já no GRASP, o algoritmo adapta esses critérios de acordo com a solução encaminhada, evitando armadilhas e viéses em que o processo guloso puro costuma cair. O Algoritmo~\ref{alg:GRASP} apresenta seu pseudocódigo.
+%
+\begin{algorithm}[htb!]
+  \caption{GRASP}\label{alg:GRASP}
+  \begin{algorithmic}[1]
+    \Require{Uma entrada $I$}
+    \Ensure{Retorna uma solução $S^*$}
+    \Function{GRASP}{I}
+      \While{Critério de parada não atingido} 
+       \State $S \gets greedyRand(I)$
+       \State $S \gets localSearch(S)$ 
+ 	  \If {$S$ for melhor que $S^*$} 
+	      \State $S^* \gets S$
+	  \EndIf
+      \EndWhile
+      \State \textbf{return} $S^*$
+      \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+Na construção da solução gulosa aleatorizada, um possível critério para selecionar elementos $i$ em um problema de minimização para a LRC é analisar se o custo de $i$ está dentro do intervalo definido pela equação: $LRC = \left\{i \leq menorCusto + (maiorCusto - menorCusto)\alpha \right\}$. Com "maiorCusto" sendo o elemento $i$ mais custoso e "menorCusto" o menos custoso. O $\alpha$ é um valor que pertence ao intervalo [$0, 1$] e define uma quantidade de elementos que pertencerão à lista, se ele valer 0, acontece a decisão gulosa  tradicional, mas se ele valer 1, todos os elementos $i$ estarão presentes na lista, o que torna o método um algoritmo totalmente aleátorio. Uma possível implementação deste algoritmo guloso aleatorizado para o VRP é apresentado no Algoritmo~\ref{alg:greedyrand}.
+%
+\begin{algorithm}[htb!]
+  \caption{Guloso Aleatorizado}\label{alg:greedyrand}
+  \begin{algorithmic}[1]
+    \Require{Um grafo $G = (V, E)$}
+    \Ensure{Retorna uma solução $S$}
+    \Function{gulosoAleatorizado}{G}
+    	\While{Não visitou todos os vértices} 
+    		\State Seja $u$  o último vértice adicionado em $S$
+    		\State Percorra todos os vértices fora de $S$ e encontre menorCusto e maiorCusto
+		\State $LRC = \left\{i \leq menorCusto + (maiorCusto - menorCusto)\alpha \right\}$
+		\State escolha um $i$ aleatoriamente em LRC
+		\State adicione $i$ no final de $S$
+      	\EndWhile
+      \State \textbf{return} $S$
+      \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+
+\subsection{Busca em Vizinhança Variável}
+
+A busca em Vizinhança Variável (VNS) é uma generalização da busca local que explora múltiplas estruturas de vizinhanças de uma solução. Denomina-se busca em vizinhança variável, pois propõe explorar o espaço de busca variando sistematicamente a vizinhança, sendo que as vizinhanças mais simples e eficientes possuem maiores chances de utilização durante a execução do algoritmo. Mais precisamente, a VNS primeiro determina uma solução que é ótimo local em uma vizinhança, então busca por melhorias em outra vizinhança, na esperança de se aproximar do ótimo global. O algoritmo termina quando a estrutura de vizinhança mais complexa utilizada alcança o mínimo local.
+
+
+\subsection{Variable Neighbourhood Descent}
+
+Uma variante particularmente eficiente à VNS é a Variable Neighbourhood Descent (VND). A VND também usa várias vizinhanças, em ordem crescente de complexidade. Quando uma estrutura de vizinhança menos complexa alcança o mínimo local, avançamos para uma mais complexa. Se esta conseguir algum resultado que melhore a solução, retornamos à estrutura anterior e continuamos a busca com ela. O algoritmo termina quando alcançamos o mínimo local em todas as estruturas. O Algoritmo \ref{alg:vnd} apresenta uma VND para o TSP, utilizando as vizinhanças 2-OPT e 3-OPT.
+%
+\begin{algorithm}[htb!]
+  \caption{VND}\label{alg:vnd}
+  \begin{algorithmic}[1]
+    \Require{A entrada $I$ e uma solução inicial $S$}
+    \Ensure{Retorna uma solução $S^*$ mínimo local em todas as vizinhanças}
+    \Function{VND}{I, S}
+	\State $S^* \gets S$
+    	\While{True} 
+    		\State $S \gets 2opt(S)$
+		\If {$S$ melhor que $S^*$}
+			\State $S^* \gets S$
+		\Else
+			\State $S \gets 3opt(S)$
+			\If {$S$ melhor que $S^*$}
+				\State $S^* \gets S$
+			\Else
+				\State Encerre o laço, pois um mínimo local da 2-OPT e da 3-OPT foi encontrado.
+    			\EndIf
+		\EndIf
+      	\EndWhile
+      \State \textbf{return} $S^*$
+      \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+
+\section{Implementação}\label{sec:implementation}
+
+Dentre os algoritmos descritos nas seções anteriores, no primeiro semestre desta iniciação científica foram implementados em linguagem Python o algoritmo guloso, o aleatorizado e a busca local com estrutura de vizinhança 2-OPT para o TSP. Também foi implementado uma metaheurística multistart para o VRP. Os detalhes de implementação e resultados foram apresentados no relatório parcial.
+
+No segundo semestre foram implementados, também em Python, a busca local 3-OPT, os dois algoritmos de clusterização descritos e uma combinação de GRASP com a VND (GRASP-VND) para o CVRP. Para atacar o GVRP, adaptamos os algoritmos de clusterização e o GRASP-VND, além de implementarmos o algoritmo de geração de pesos.
+
+Os algoritmos foram testados com diversas instâncias para avaliar seus desempenhos tanto em tempo quanto em qualidade de soluções. Os resultados obtidos nesses testes estão descritos na Seção~\ref{sec:resultados} e podem ser conferidos junto aos códigos no github \footnote{https://github.com/matheustmattioli/ICCVRPheuristic} \footnote{https://github.com/matheustmattioli/ICMultiObjGVRP}. 
+
+
+\subsection{Clusterização}
+
+Para implementar os algoritmos de clusterização, trabalhamos com um grafo completo $G = (V, E)$ e distâncias euclidianas entre os vértices para representar o peso das arestas.\par
+Para implementar os dois métodos de clusterização inserimos todos os vértices, exceto o depósito, em um dicionário, a fim de facilitar as operações de inserção, remoção e verificação de clientes. Selecionamos um cliente aleatoriamente no dicionário por meio da função \textit{random.choice(dicionario.keys()))}. A partir disso os caminhos mudam dependendo do procedimento, no nomeado Caminho Guloso, entramos no laço principal que dura até que o dicionário esteja vazio, ou que a capacidade $W$ do veículo acabe. A cada iteração do laço, o cliente mais próximo do cliente inserido anteriormente é colocado no \textit{cluster} se sua capacidade respeitar a capacidade restante do veículo. No final, inserimos o depósito na lista e devolvemos essa partição do conjunto $V$ para o programa resolver como um TSP entre depósito e clientes.\par
+Já no algoritmo de clusterização com centros em Paralelo, selecionamos vértices aleatórios para ser centro de \textit{cluster} $h$ vezes, com $h$ sendo o tamanho da frota, então, trabalhamos com a formação $h$ \textit{clusters} ao mesmo tempo. Após essa seleção, entramos no laço principal, que dura enquanto ou existem clientes para serem atendidos, ou há capacidade disponível para inserir um cliente em algum \textit{cluster}. Daí, analisamos em qual centro o cliente escolhido neste laço está mais próximo e o inserimos na partição que este centro se encontra. No final, inserimos o depósito em todas as listas, que representam as partições no programa, e, também, as retornamos para que o programa resolvá-as como um TSP.\par
+As adaptações para atacar o GVRP foram feitas nas linhas que se referem à decisões de proximidade, em que pesos entre $0$ e $1$, ponderam as escolhas conforme o peso das funções objetivos nesta rodada do programa.
+
+
+\subsection{Multistart}
+
+O multistart funciona decidindo a melhor solução obtida após uma quantidade estipulada de reinícios do programa, naturalmente, para termos soluções distintas, a construção delas deve possuír alguma etapa aleatorizada. Felizmente, nosso programa apresenta aleatorização na construção das partições e na etapa de construção das soluções. Então, para controlar esses reinícios, implementamos algumas variáveis de controle, tais como o \textit{N\_ITE\_MS\_CLUST}, que define a quantidade de iterações do multistart na clusterização, isto é trabalhamos o problema com formações de várias partições distintas. E temos o \textit{N\_ITE\_GRASP} com o \textit{MAX\_ITER\_W\_NO\_IMPROV} que definem quantas vezes executamos o GRASP, eles serão melhor explicados na próxima subseção.
+
+
+\subsection{GRASP-VND}
+
+O GRASP funciona com uma etapa construtiva gulosa aleatorizada, uma etapa de busca local e um laço principal que une as duas etapas anteriores em uma espécie de multistart. Na nossa implementação, utilizamos as variáveis \textit{N\_ITE\_GRASP} e \textit{MAX\_ITER\_W\_NO\_IMPROV} para controlar o número de iterações desse laço principal. Dentro dele, chamamos o método construtivo e a busca local, sendo que a busca local é um \textit{Variable Neighbourhood Descent}, no final de cada laço avaliamos se a solução obtida é melhor que a melhor solução encontrada em rodadas anteriores. Também atualizamos o valor $\alpha$ utilizado no método construtivo para definir o tamanho da lista restrita de candidatos, seu valor é incrementado até o valor máximo definido de $0,5$. Este valor é independente da variável \textit{N\_ITE\_GRASP}, ela apenas influencia em quanto o $\alpha$ é incrementado por iteração, porém, pode ser que o valor máximo do $\alpha$ não seja atingido caso a variável \textit{MAX\_ITER\_W\_NO\_IMPROV} seja violada.\par
+O método construtivo é guloso aleatorizado e adaptativo. É guloso aleatorizado por conta da LRC, adaptativo porque a atualizamos em cada laço do método guloso. Sendo assim, o algoritmo foi implementado através de um laço principal que opera enquanto existirem vértices fora da rota. A cada iteração é analisado o vértice mais distante e mais próximo do vértice inserido anteriormente na rota, daí calculamos o intervalo de valores possíveis de serem inseridos na LRC e inserimos os vértices presentes nesse intervalo na LRC, então selecionamos um desses vértices aleatoriamente e inserimos na rota. É adaptativo, pois a cada iteração atualizamos a lista restrita de candidatos de acordo com o último vértice inserido. O $\alpha$ só é atualizado no multistart do GRASP, na etapa construtiva ele entra no cálculo da LRC.\par
+Após a construção da solução, ocorre a etapa de intensificação do GRASP conhecido como busca local, porém no nosso caso, utilizamos a VND como procedimento de busca local. É um procedimento simples que funciona com um laço principal, que dura enquanto não encontramos o mínimo local de todas as estruturas de vizinhança, e as estruturas 2-opt e 3-opt. A 2-opt é utilizada a cada laço até que ela não melhore mais a solução, a partir desse ponto, utilizamos a 3-opt, se ela melhorar a solução, na próxima iteração retornamos a utilizar a 2-opt, senão, o algoritmo encerra e retorna a melhor solução encontrada.\par
+A adaptação feita para o GVRP é presente na etapa construtiva, com os pesos das funções objetivo influenciando nas escolhas de vizinho mais distante e mais próxima, e portanto, no cálculo do intervalo da LRC. Também é presente na etapa de intensificação, dentro das estruturas 2-opt e 3-opt os pesos participam do cálculo de escolha menos custosa.
+
+
+\section{Resultados Experimentais}\label{sec:resultados}
+
+Nesta seção são apresentados os resultados obtidos pelos algoritmos implementados para os problemas CVRP e GVRP. Todos os testes foram executados em um processador AMD FX-8350 CPU 4.0GHz, com o sistema operacional Windows 10, versão 21H1 e \textit{OS build} 19043.1110. Os testes foram realizados com as variáveis de controle nas seguintes configurações: $ \textit{N\_ITE\_MS\_CLUST} = 100$,  $ \textit{MAX\_ITER\_W\_NO\_IMPROV} = 100 $ e $ \textit{N\_ITE\_GRASP} = 500$.
+
+
+\subsection{Testes para o CVRP}
+
+A seguir são apresentadas as Tabelas \ref{tab:table1} e \ref{tab:table2} que contêm os resultados da aplicação dos algoritmos implementados em instâncias selecionadas para o CVRP. As Figuras \ref{fig:vrpteste1} e \ref{fig:vrpteste2} ilustram a solução obtida para a instância "vrp\_16\_3\_1", respectivamente, pelo GRASP-VND com clusterização \textit{Greedy Path} e pelo GRASP-VND com clusterização em Paralelo.\par
+%
+\begin{table}[htb!]
+  \begin{center}
+    \begin{tabular}{l|r|r|r|r|r|r|r}
+      \toprule % <-- Toprule here
+      \textbf{Instância} & \textbf{Clientes} & \textbf{Veículos} & \textbf{Capacidade} & \textbf{Valor Ótimo} & \textbf{Custo} & \textbf{Tempo (s)}\\
+      \midrule % <-- Midrule here
+      vrp\_16\_3\_1 & 16 & 3 & 90 & 279 & 284,10 & 5,18\\
+      vrp\_26\_8\_1 & 26 & 8 & 48 & 622 & 628,17 & 6,80\\ 
+      vrp\_51\_5\_1 & 51 & 5 & 160 & 525 & 594,80 & 72,37 \\
+      vrp\_101\_10\_1 & 101 & 10 & 200 & 829 & 879,71 & 201,37\\
+      vrp\_200\_16\_1 & 200 & 16 & 200 & 1400 & 1624,96 & 517,52\\
+      vrp\_421\_41\_1 & 421 & 41 & 200 & 2000 & 2057,30 & 768,78\\
+      \bottomrule % <-- Bottomrule here
+    \end{tabular}
+    \caption{Custos das soluções produzidas pelo GRASP-VND com clusterização Greedy Path.}
+    \label{tab:table1}
+  \end{center}
+\end{table}
+
+\begin{figure}[htb!]
+\centering
+\includegraphics[scale=0.7]{vrp1.png}
+\caption{Solução encontrada pelo GRASP-VND com clusterização Greedy Path para a instância de 16 clientes do CVRP.}
+\label{fig:vrpteste1}
+\end{figure}
+
+\begin{table}[htb!]
+  \begin{center}
+    \begin{tabular}{l|r|r|r|r|r|r|r}
+      \toprule % <-- Toprule here
+      \textbf{Instância} & \textbf{Clientes} & \textbf{Veículos} & \textbf{Capacidade} & \textbf{Valor Ótimo} & \textbf{Custo} & \textbf{Tempo (s)}\\
+      \midrule % <-- Midrule here
+      vrp\_16\_3\_1 & 16 & 3 & 90 & 279 & 284,61 & 5,52\\
+      vrp\_26\_8\_1 & 26 & 8 & 48 & 622 & Sem resposta & Sem resposta\\ 
+      vrp\_51\_5\_1 & 51 & 5 & 160 & 525 & 597,57 & 78,09 \\
+      vrp\_101\_10\_1 & 101 & 10 & 200 & 829 & 1013,03 & 183,32\\
+      vrp\_200\_16\_1 & 200 & 16 & 200 & 1400 & Sem resposta & Sem resposta\\
+      vrp\_421\_41\_1 & 421 & 41 & 200 & 2000 & 2334,74 & 841,78\\
+      \bottomrule % <-- Bottomrule here
+    \end{tabular}
+    \caption{Custos das soluções produzidas pelo GRASP-VND com clusterização em Paralelo. Por conta da natuzera da clusterização em paralelo, alguns clientes não foram atendidos nas instâncias de 26 clientes e de 200, portanto, o algoritmo não retornou resposta válida.}
+    \label{tab:table2}
+  \end{center}
+\end{table}
+
+\begin{figure}[htb!]
+\centering
+\includegraphics[scale=0.7]{vrp2.png}
+\caption{Solução encontrada pelo GRASP-VND com clusterização em Paralelo para a instância de 16 clientes do CVRP.}
+\label{fig:vrpteste2}
+\end{figure}
+
+
+\subsection{Testes para o GVRP}
+
+Como as instâncias trabalhadas do GVRP são adaptações das do CVRP, não sabemos sua fronteira de pareto ótima, ou seja, o conjunto ótimo de soluções não dominadas. As Figuras~\ref{fig:gvrp} a \ref{fig:gvrp6} apresentam o conjunto de soluções encontrado com o GRASP-VND adaptado para as funções distância e emissão de poluentes, ambas de minimização.
+
+\begin{figure}[htb!]
+\centering
+\includegraphics[scale=0.7]{GVRP1.png}
+\caption{Conjunto de soluções para a instância vrp\_16\_3\_1}
+\label{fig:gvrp}
+\end{figure}
+
+\begin{figure}[htb!]
+\centering
+\includegraphics[scale=0.7]{GVRP2.png}
+\caption{Conjunto de soluções para a instância vrp\_26\_8\_1}
+\label{fig:gvrp2}
+\end{figure}
+
+\begin{figure}[htb!]
+\centering
+\includegraphics[scale=0.7]{GVRP3.png}
+\caption{Conjunto de soluções para a instância vrp\_51\_5\_1}
+\label{fig:gvrp3}
+\end{figure}
+
+\begin{figure}[htb!]
+\centering
+\includegraphics[scale=0.7]{GVRP4.png}
+\caption{Conjunto de soluções para a instância vrp\_101\_10\_1}
+\label{fig:gvrp4}
+\end{figure}
+
+\begin{figure}[htb!]
+\centering
+\includegraphics[scale=0.7]{GVRP5.png}
+\caption{Conjunto de soluções para a instância vrp\_200\_16\_1}
+\label{fig:gvrp5}
+\end{figure}
+
+\begin{figure}[htb!]
+\centering
+\includegraphics[scale=0.7]{GVRP6.png}
+\caption{Conjunto de soluções para a instância vrp\_421\_41\_1}
+\label{fig:gvrp6}
+\end{figure}
+
+
+\section{Pedido de Renovação da Bolsa}\label{sec:pror}
+
+Esta seção trata do pedido de renovação da bolsa e do planejamento das próximas etapas do projeto. Durante este projeto de iniciação científica, o bolsista estudou diversas abordagens heurísticas e metaheurísticas, usando o VRP como linha condutora deste estudo. No final, algoritmos baseados em algumas das abordagens estudadas foram implementados e testados. Destacamos que alguns dos algoritmos implementados foram para o TSP, caso particular do VRP, enquanto outros foram para generalizações, como o CVRP e o GVRP. Assim, o projeto permitiu ao estudante construir uma base de conhecimentos sobre problemas de roteamento e métodos heurísticos. Nas etapas seguintes queremos aplicar esses conhecimentos para desenvolver, implementar e testar métodos heurísticos para o Problema do Roteamento da Mula de Dados (PRMD).
+
+O PRMD é um problema de roteamento em que um agente, chamado de mula de dados, deve coletar dados de sensores esparsamente espalhados em uma certa região e retornar para a base da qual partiu, formando um circuito ~\cite{munhoz2019locality}. A principal diferença deste problema para outros problemas de roteamento, como TSP e VRP, é o fato dos sensores terem wi-fi, permitindo que a coleta seja feita a uma certa distância do aparelho, além da possibilidade de comunicação entre os sensores. Por conta dessas características, há a possibilidade de atender mais de um sensor a partir de uma mesma localização.
+
+Para atacar este problema, pretendemos projetar e implementar um GRASP-VND e combiná-lo com o BRKGA. Acreditamos que essas abordagens são promissoras pois, além do estudante já ter alguma experiência com a metaheurística GRASP-VND, esta produz uma coleção de soluções variadas, por conta do algoritmo guloso aleatorizado, e de boa qualidade, por conta da intensificação da busca VND. Assim, as soluções produzidas pelo GRASP-VND podem ser usadas como população inicial do BRKGA. Isso porque o BRKGA, que é uma metaheurística evolutiva aleatorizada, costuma se beneficiar ao receber algumas soluções de boa qualidade em sua população inicial, ao invés de usar apenas indivíduos gerados aleatoriamente. Também existe a possibilidade de trabalharmos com uma definição multiobjetiva do problema e com variantes que consideram outras restrições na rede de sensores, como as encontradas em Ma et al. \cite{ma2012tour} e Sugihara e Gupta \cite{sugihara2011path}.
+
+
+\section{Cronograma}\label{sec:cronograma}
+
+A Tabela \ref{tab:cronogramacumprido} contém o cronograma completo do projeto original. 
+%
+\begin{table}[htb!]
+\begin{center}
+    \caption{Cronograma das atividades.}
+    \label{tab:cronogramacumprido}
+    %\begin{tabular}{ |l*{6}{|c}| }
+    \begin{tabular}{ |l*{12}{|c}| }
+    \hline
+    \multirow{2}{*}{Atividades} & \multicolumn{12}{ |c| }{Meses} \\
+    \cline{2-13}
+    & ~1 & ~2 & ~3 & ~4 & ~5 & ~6 & ~7 & ~8 & ~9 & 10 & 11 & 12 \\ \hline
+    Heurísticas & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ &&&&&&&& \\ \hline
+    Meta-Heurísticas &&&& & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ &&&& \\ \hline
+    Variantes do problema &&&&&&& & & $\bullet$ &$\bullet$ & $\bullet$ & $\bullet$\\ \hline
+    Implementação & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$\\ \hline
+    \end{tabular}
+\end{center}
+\end{table}
+
+O primeiro semestre foi destinado ao estudo de bases teóricas, de algoritmos heurísticos clássicos para o TSP e sua generalização, o VRP, bem como de abordagens metaheurísticas. Também teve início nesse período a fase de implementação, com foco em algoritmos heurísticos. Além disso, foram realizados testes que avaliam a qualidade das soluções produzidas por esses algoritmos e a eficiência da implementação dos mesmos.
+
+No segundo semestre desta iniciação científica, continuou-se o estudo e implementação de algoritmos para o VRP com mais profundidade, explorando combinações de heurísticas e meta-heurísticas estudadas, como o GRASP com a fase de intensificação sendo uma Variable Neighbourhood Descent. Também iniciou-se os estudos e implementações de algoritmos para a variante CVRP. E dentre eles, abordou-se algoritmos de agrupamento, ou clusterização, para lidar com a questão da capacidade dos veículos.
+
+Os últimos dois meses da IC foram dedicados ao tema da otimização multiobjetivo, no qual, estudou-se seus principais conceitos, como fronteira de pareto. A variante bi-objetiva GVRP foi escolhida para ser atacada com os métodos de clusterização, heurísticas e meta-heurísticas adaptadas para problemas deste tipo.
+
+Durante todo o período do projeto, foram feitas reuniões com os professores orientadores e elas foram compartilhadas com outro orientando, o qual trabalha com o problema do VRP usando métodos exatos. Isto foi proveitoso para desenvolver trabalhos em conjunto, onde cada um dos orientandos teve a oportunidade de contribuir com a pesquisa do outro. Dentre essas contribuições vale destacar que publicamos um artigo nomeado Spanning Cover Inequalities for the Capacitated Vehicle Routing Problem \cite{arcencio2021spanning} nos anais do VI Encontro de Teoria da Computação (ETC 2021), conquistando o prêmio de melhor trabalho publicado.
+
+Em caso de resposta positiva da FAPESP sobre o pedido de prorrogação da bolsa, haverá uma próxima etapa do projeto, com duração de 12 meses, na qual será estudado o problema PRMD, que é uma variante do VRP. Pretende-se aplicar técnicas meta-heurísticas ao problema, em particular, GRASP-VND e BRKGA. A Tabela \ref{tab:cronogramaproposto} apresenta o planejamento do período requisitado da prorrogação da bolsa.
+
+\begin{table}[htb!]
+\begin{center}
+    \caption{Cronograma para as próximas atividades.}
+    \label{tab:cronogramaproposto}
+   %\begin{tabular}{ |l*{6}{|c}| }
+    \begin{tabular}{ |l*{12}{|c}| }
+    \hline
+    \multirow{2}{*}{Atividades} & \multicolumn{12}{ |c| }{Meses} \\
+    \cline{2-13}
+    & ~1 & ~2 & ~3 & ~4 & ~5 & ~6 & ~7 & ~8 & ~9 & 10 & 11 & 12 \\ \hline
+    Revisão Bibliográfica sobre o PRMD & $\bullet$ & $\bullet$ & & & & & & & & & & \\ \hline
+    GRASP-VND para o PRMD & & & $\bullet$ & $\bullet$ & $\bullet$ & & & & & & & \\ \hline
+    BRKGA para o PRMD & & & & & & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & & & \\ \hline
+    Variante Multiobjetivo do PRMD & & & & & & & & & & $\bullet$ & $\bullet$ & $\bullet$ \\ \hline
+    \end{tabular}
+\end{center}
+\end{table}
+
+
+\section{Conclusão}\label{sec:conclusao}
+
+Foram estudados e implementados em Python algoritmos conhecidos para o problema do caixeiro viajante e do roteamento de veículos, como algoritmos gulosos, aleatorizados e heurísticas de busca local com estrutura de vizinhaça 2-OPT. Na busca local foram implementadas as escolhas best fit e first fit, a fim de comparar a qualidade das soluções produzidas por cada uma delas.
+A heurística construtiva aleatorizada foi usada junto da busca local, na implementação de uma metaheurística multistart.
+
+A partir desses primeiros passos, adaptamos o algoritmo guloso, proposto na Seção \ref{subsec:algguloso}, inserindo uma lista restrita de candidatos e a escolha aleatória de um elemento dessa lista, chegando na meta-heurística GRASP. Através da combinação da estrutura de vizinhança 3-OPT com a da 2-OPT, obteu-se a meta-heurística de busca local VND. Substituindo a busca local do GRASP pela VND, formou-se uma meta-heurística mais robusta chamada de GRASP-VND.
+
+Então, para atacar o CVRP houve uma redução ao TSP através de métodos de clusterização, no qual se formou subconjuntos de clientes do conjunto original para cada caminhão, respeitando suas capacidades. 
+Para o GVRP, os algoritmos foram adaptados para ponderar a influência nas escolhas de cada função objetivo, através da escolha de um esquema de pesos a cada iteração.
+
+Os resultados obtidos com os algoritmos implementados corresponderam ao que era esperado de heurísticas e meta-heurísticas. Isso porque os algoritmos implementados foram bem eficientes e, mesmo que sem garantias de otimalidade, apresentaram soluções de boa qualidade. Por conta dos estudos mencionados, houve o desenvolvimento de mais familiaridade com a linguagem Python, estruturas matemáticas, como grafos, tipos abstratos de dados, como dicionários, e problemas NP-Difíceis, enriquecendo meu conhecimento em ciência da computação, projeto e análise de algoritmos e otimização combinatória.
+
+Fiquei muito feliz com a oportunidade de desenvolver este projeto e ainda existem muitas atividades relevantes sugeridas a serem realizadas, como a implementação de mais meta-heurísticas e a oportunidade de trabalhar com o problema de roteamento de mula de dados, o que deixará o projeto ainda mais completo. Dito isto, considero a conclusão dessa etapa do projeto bem sucedida e espero que as próximas etapas também possam ser realizadas.
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+
+\end{document}
