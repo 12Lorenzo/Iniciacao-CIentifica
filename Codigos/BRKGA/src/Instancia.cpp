@@ -97,7 +97,7 @@ double Instancia::getDist(int no1, int no2){
     return result;
 }
 
-vector<vector<double>> Instancia::getDistancias(){
+void Instancia::formaMatDistancias(){
     vector<vector<double>>::iterator lin;
     vector<double>::iterator col;
     int i = 0, j = 0;
@@ -107,7 +107,19 @@ vector<vector<double>> Instancia::getDistancias(){
         }
     }
     
-    return distancias;
+    
+}
+
+void Instancia::mostraMatDistancias(){
+    vector<vector<double>>::iterator lin;
+    vector<double>::iterator col;
+    int i = 0, j = 0;
+    for (lin = distancias.begin(); lin != distancias.end(); lin++){
+        for(col = (*lin).begin(); col != (*lin).end(); col++){
+            cout<< *col;
+        }
+        cout << endl;
+    }
 }
 
 void Instancia::mostraInst(string nomeArq){

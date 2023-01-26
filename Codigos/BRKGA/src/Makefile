@@ -1,16 +1,16 @@
 # Macros:
 CPP= g++
 CFLAGS= -O3 -fopenmp
-OBJECTS= SampleDecoder.o
+OBJECTS= samplecode.cpp
 
 # Targets:
 all: samplecode
 
 samplecode: $(OBJECTS)
-	$(CPP) $(CFLAGS) $(OBJECTS) -o samplecode
+	$(CPP) $(CFLAGS) $(OBJECTS) -o samplecode.exe
         
-SampleDecoder.o:
-	$(CPP) $(CFLAGS) -c SampleDecoder.cpp
+#SampleDecoder.o:
+#	$(CPP) $(CFLAGS) -c -o SampleDecoder.cpp sampleDecoder.exe
 
 # Remove:
 clean:

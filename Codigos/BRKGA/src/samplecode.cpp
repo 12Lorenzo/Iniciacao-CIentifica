@@ -2,6 +2,7 @@
 #include "SampleDecoder.h"
 #include "MTRand.h"
 #include "BRKGA.h"
+#include "Instancia.h"
 
 int main(int argc, char* argv[]) {
 	const unsigned n = 100;		// size of chromosomes
@@ -12,6 +13,16 @@ int main(int argc, char* argv[]) {
 	const unsigned K = 3;		// number of independent populations
 	const unsigned MAXT = 2;	// number of threads for parallel decoding
 	
+	if(argc < 2){
+		std::cout << "Quantidade invalida de paremetros, passar por exemplo: ../../instances/doublecenter/doublecenter-1-n375.txt" << endl;
+	}else{
+		Instancia inst = Instancia(argv[1]);
+		
+		//inst.printInst();
+		inst.formaMatDistancias();
+		inst.mostraMatDistancias();
+	}
+	/*
 	SampleDecoder decoder;			// initialize the decoder
 	
 	const long unsigned rngSeed = 0;	// seed to the random number generator
@@ -34,6 +45,8 @@ int main(int argc, char* argv[]) {
 	
 	std::cout << "Best solution found has objective value = "
 	 		<< algorithm.getBestFitness() << std::endl;
+
+	*/
 	
 	return 0;
 }
