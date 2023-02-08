@@ -15,7 +15,11 @@ public:
     Instancia(string nomeArq);
     ~Instancia();
 
+    //Retorna o número de nós que tem a instancia
     int getNumNos();
+
+    //Retorna a matriz de distancias
+    vector<vector<double>> getMatDistancias();
 
     //Funcao para calcular a distancia entre dois pontos
     double getDist(int no1, int no2);
@@ -26,13 +30,13 @@ public:
     //Mostra a matriz de distancias
     void mostraMatDistancias();
 
-
     //Mostra os nos e a distancia entre eles
     void mostraPontoDist(int no1, int no2);
 
     //Matriz para conter a distancia entre os pontos
 
     void mostraInst(string nomeArq);
+    
     pair<double, double> formaPairCoord(double coordX, double coordY);
     //vector<tuple<int, double, double, float>> recebeInst(string nomeArq);
     
@@ -119,6 +123,10 @@ int Instancia::getNumNos(){
     return numNos;
 }
 
+vector<vector<double>> Instancia::getMatDistancias(){
+    return distancias;
+}
+
 double Instancia::getDist(int no1, int no2){
     double result;
     double cat1, cat2;
@@ -133,7 +141,7 @@ double Instancia::getDist(int no1, int no2){
 void Instancia::formaMatDistancias(){
     int i, j;
 
-    cout << "Numero de nos: " << numNos << endl;
+    //cout << "Numero de nos: " << numNos << endl;
 
     for (i = 0; i < numNos; i++){
         vector<double> lin;

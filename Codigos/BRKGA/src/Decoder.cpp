@@ -27,25 +27,32 @@ Ex: n = 5
 	fitnessCrom = dist(circuito)
 */
 
+Decoder::Decoder(){}
+
+Decoder::~Decoder(){}
+
 //Passar 
-double SampleDecoder::decode(const std::vector< double >& chromosome) const {
+double Decoder::decode(const std::vector< double >& chromosome) const {
     //std::cout << "Socorro";
 
 	Instancia inst;
 
 	vector<tuple<int, double, double, float>> grafo(0);
 
-	//inst.recebeInst();
-	//inst.mostraInst("doublecenter", "doublecenter-11-n375.txt");
-
     return 0;
 }
 
-void ordena(vector<tuple<int, double, double, float>> cromossomo){
-	vector<tuple<int, double, double, float>>::iterator i = cromossomo.end();
+//Antes era ordena(vector<tuple<int, double, double, float>> cromossomo)
+void ordena(vector<tuple< double, double>> cromossomo){
+	vector<tuple<double, double>>::iterator i = cromossomo.end();
 
 	std::cout << "\n" << get<1>(*i);
 }
+
+void Decoder::mostraCromossomo(vector<tuple<int, double>> cromossomo){
+	std::cout << "\n" << get<0>(cromossomo[0]);
+}
+
 /*
 int main(){
 

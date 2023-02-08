@@ -3,6 +3,8 @@
 #include "MTRand.h"
 #include "BRKGA.h"
 #include "Instancia.h"
+#include "Utils.h"
+#include "Decoder.h"
 
 int main(int argc, char* argv[]) {
 	const unsigned n = 100;		// size of chromosomes
@@ -20,7 +22,28 @@ int main(int argc, char* argv[]) {
 		
 		//inst.printInst();
 		inst.formaMatDistancias();
-		inst.mostraMatDistancias();
+		//inst.mostraMatDistancias();
+
+		Decoder dec;
+
+		vector<tuple<int, double>> crom;
+
+		tuple<int, double> tupla1, tupla2, tupla3, tupla4, tupla5;
+
+		tupla1 = make_tuple(1, 0.1);
+		tupla2 = make_tuple(2, 0.7);
+		tupla3 = make_tuple(3, 0.2);
+		tupla4 = make_tuple(4, 0.5);
+		tupla5 = make_tuple(5, 0.931);
+
+		crom.push_back(tupla1);
+		crom.push_back(tupla2);
+		crom.push_back(tupla3);
+		crom.push_back(tupla4);
+		crom.push_back(tupla5);
+
+		dec.mostraCromossomo(crom);
+
 	}
 	/*
 	SampleDecoder decoder;			// initialize the decoder
