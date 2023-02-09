@@ -31,26 +31,79 @@ Decoder::Decoder(){}
 
 Decoder::~Decoder(){}
 
-//Passar 
-double Decoder::decode(const std::vector< double >& chromosome) const {
+//Antes estava recendo um endereço para chromossome
+double Decoder::decode(Instancia inst) {
     //std::cout << "Socorro";
 
-	Instancia inst;
+    int i;
+    double distCir;
+	Instancia inst = Instancia("../../instances/doublecenter/doublecenter-1-n5.txt");
+	vector<tuple< int, float, double, double>> crom = formaCromossomo(inst.getNumNos(), inst.getNos());
+    crom = ordena(crom);
+	inst.formaMatDistancias();
+    vector<vector<double>> dist = inst.getMatDistancias();
+    //mostraCromossomo(crom);
 
-	vector<tuple<int, double, double, float>> grafo(0);
-
-    return 0;
+    for (i = 0; i < inst.getNumNos(); i++){
+        distCir += dist[get<0>(crom[i])][get<0>(crom[i+1])];
+        //cout<< "Partiu de: " << get<0>(crom[i]) << "Ate: " << get<0>(crom[i+1]) << endl;
+    }
+    distCir += dist[get<0>(crom[inst.getNumNos() - 1])][get<0>(crom[0])];
+    return distCir;
 }
 
 //Antes era ordena(vector<tuple<int, double, double, float>> cromossomo)
-void ordena(vector<tuple< double, double>> cromossomo){
-	vector<tuple<double, double>>::iterator i = cromossomo.end();
+//Foi usado o selection sort para ordenar o cromossomo
+vector<tuple< int, float, double, double>> Decoder::ordena(vector<tuple< int, float, double, double>> cromossomo){
+	
+    int tamCrom = cromossomo.size();
+    int min;
 
-	std::cout << "\n" << get<1>(*i);
+    for (auto it = 1; it < tamCrom; ++it){
+        
+        min = it;
+
+        for (auto itj = it + 1; itj < tamCrom; ++itj){
+            //std::cout <<  "No J: " << get<0>(cromossomo[j]) << " Valor J: " << get<1>(cromossomo[j]) <<  " No Min: " << get<0>(cromossomo[min])<< " Valor Min: " << get<1>(cromossomo[min]) << std::endl;
+            if (get<1>(cromossomo[itj]) < get<1>(cromossomo[min])){
+                min = itj;
+            }
+        }
+        if(min != it){
+            swap(cromossomo[min], cromossomo[it]);
+        }
+    }
+
+    return cromossomo;
 }
 
-void Decoder::mostraCromossomo(vector<tuple<int, double>> cromossomo){
-	std::cout << "\n" << get<0>(cromossomo[0]);
+vector<tuple<int, float, double, double>> Decoder::formaCromossomo(int quantNo, vector<pair<double, double>> coords){
+    vector<tuple<int, float, double, double>> crom;
+    int i;
+    srand(time(0));
+    for (i = 0; i < quantNo; i++){
+        float valAleatorio = static_cast<double>(rand()) / RAND_MAX;
+        crom.push_back(make_tuple(i, valAleatorio, coords[i].first, coords[i].second));
+    }
+
+    return crom;
+}
+
+void Decoder::mostraCromossomo(vector<tuple<int, float, double, double>> cromossomo){
+	int x;
+    double y;
+
+    int cont = 0;
+
+    for (auto it = cromossomo.begin(); it != cromossomo.end(); ++it) {
+        //auto [x, y] = *it;
+        
+        std::cout << "No: " << get<0>(cromossomo[cont]) << " Valor: " << get<1>(cromossomo[cont]) 
+                  << " CoordX: " << get<2>(cromossomo[cont]) << " CoordY: " << get<3>(cromossomo[cont]) << std::endl;
+        cont++;
+    }
+    //std::cout<<"Tamanho do cromossomo: " << cont;
+    //std::cout << "\n" << get<0>(cromossomo[0]);
 }
 
 /*

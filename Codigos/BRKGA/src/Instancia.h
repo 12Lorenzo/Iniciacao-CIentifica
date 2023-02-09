@@ -18,6 +18,8 @@ public:
     //Retorna o número de nós que tem a instancia
     int getNumNos();
 
+    vector<pair<double, double>> getNos();
+
     //Retorna a matriz de distancias
     vector<vector<double>> getMatDistancias();
 
@@ -121,6 +123,10 @@ Instancia::~Instancia(){ }
 
 int Instancia::getNumNos(){
     return numNos;
+}
+
+vector<pair<double, double>> Instancia::getNos(){
+    return nos;
 }
 
 vector<vector<double>> Instancia::getMatDistancias(){
