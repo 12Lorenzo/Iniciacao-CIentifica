@@ -32,23 +32,28 @@ Decoder::~Decoder(){}
 double Decoder::decode(Instancia inst) {
     //std::cout << "Socorro";
 
-    int i;
     double distCir = 0;
     //Instancia inst = Instancia("../../instances/doublecenter/doublecenter-1-n5.txt");
 	vector<tuple< int, float, double, double>> crom = formaCromossomo(inst.getNumNos(), inst.getNos());
     crom = ordena(crom);
-	inst.formaMatDistancias();
     vector<vector<double>> dist = inst.getMatDistancias();
     mostraCromossomo(crom);
     cout<<endl;
-    for (i = 0; i < inst.getNumNos(); i++){
-        distCir += dist[get<0>(crom[i])][get<0>(crom[i+1])];
-        //cout<< "Partiu de: " << get<0>(crom[i]) << " Ate: " << get<0>(crom[i+1]) << " Distancia ate o momento:" << distCir << endl;
-        //cout <<"Valor de i: " << i;
+    //cout << "Quantidade de nos: " << inst.getNumNos();
+    for (int i = 0; i < inst.getNumNos() - 1; i++){
+
+        
+        //cout <<"Valor de i: " << i << " Quantidade de nos: " << inst.getNumNos() << endl;
+       
+            distCir += dist[get<0>(crom[i])][get<0>(crom[i+1])];
+
+            cout<< "Partiu de: " << get<0>(crom[i]) << " Ate: " << get<0>(crom[i+1]) << " Distancia ate o momento:" << distCir << endl;
+        
+        
     }
     //cout <<"Valor de i: " << i;
     //cout << "Distancia do final para o inicial: " << dist[get<0>(crom[inst.getNumNos() - 1])][get<0>(crom[0])];
-    //distCir += dist[get<0>(crom[inst.getNumNos() - 1])][get<0>(crom[0])];
+    distCir += dist[get<0>(crom[inst.getNumNos() - 1])][get<0>(crom[0])];
     //cout<<"Distancia circuito: " << distCir;
     return distCir;
 }

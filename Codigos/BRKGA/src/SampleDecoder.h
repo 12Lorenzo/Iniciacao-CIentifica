@@ -56,6 +56,7 @@ double SampleDecoder::decode(const std::vector< double >& chromosome) const {
 
 	// sample fitness is the first allele
 	return chromosome.front();
+	
 }
 
 #endif

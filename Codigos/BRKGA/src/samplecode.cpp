@@ -21,41 +21,25 @@ int main(int argc, char* argv[]) {
 		Instancia inst = Instancia(argv[1]);
 		
 		//inst.printInst();
-		//inst.formaMatDistancias();
+		inst.formaMatDistancias();
 		//inst.mostraMatDistancias();
-		/*
-		Decoder dec;
 		
-		vector<tuple<int, float, double, double>> crom;
-
-		tuple<int, float, double, double> tupla1, tupla2, tupla3, tupla4, tupla5;
-
-		tupla1 = make_tuple(0, 0.7, 0, 0);
-		tupla2 = make_tuple(1, 0.1, 0, 0);
-		tupla3 = make_tuple(2, 0.8, 0, 0);
-		tupla4 = make_tuple(3, 0.5, 0, 0);
-		tupla5 = make_tuple(4, 0.431, 0, 0);
-
-		crom.push_back(tupla1);
-		crom.push_back(tupla2);
-		crom.push_back(tupla3);
-		crom.push_back(tupla4);
-		crom.push_back(tupla5);
+		Decoder dec;
 		
 		vector<tuple<int, float, double, double>> crom = dec.formaCromossomo(inst.getNumNos(), inst.getNos());
 
-		dec.mostraCromossomo(crom);
+		//dec.mostraCromossomo(crom);
 		cout<< endl;
 		crom = dec.ordena(crom);
 		cout<<endl;
-		dec.mostraCromossomo(crom);
-		*/
+		//dec.mostraCromossomo(crom);
+		
 		//std::cout << "Passou";
-		//double resul = dec.decode(inst);
+		double resul = dec.decode(inst);
 
-		//cout <<"Custo do caminho: " << resul << endl;
+		cout <<"Custo do caminho: " << resul << endl;
 	
-	
+		/*
 		SampleDecoder decoder;			// initialize the decoder
 		Decoder dec;
 
@@ -81,7 +65,7 @@ int main(int argc, char* argv[]) {
 		
 		std::cout << "Best solution found has objective value = "
 				<< algorithm.getBestFitness() << std::endl;
-
+		*/
 	
 	}
 	
