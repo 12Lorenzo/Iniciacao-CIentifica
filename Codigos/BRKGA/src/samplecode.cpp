@@ -19,29 +19,25 @@ int main(int argc, char* argv[]) {
 		std::cout << "Quantidade invalida de paremetros, passar por exemplo: ../../instances/doublecenter/doublecenter-1-n375.txt" << endl;
 	}else{
 		Instancia inst = Instancia(argv[1]);
-		
-		//inst.printInst();
 		inst.formaMatDistancias();
-		//inst.mostraMatDistancias();
 		
 		Decoder dec;
 		
 		vector<tuple<int, float, double, double>> crom = dec.formaCromossomo(inst.getNumNos(), inst.getNos());
 
-		//dec.mostraCromossomo(crom);
+		std::cout <<"Custo do caminho: " << dec.decode(inst) << endl;
+
+		/*
+		dec.mostraCromossomo(crom);
 		cout<< endl;
 		crom = dec.ordena(crom);
 		cout<<endl;
-		//dec.mostraCromossomo(crom);
-		
-		//std::cout << "Passou";
-		double resul = dec.decode(inst);
-
-		cout <<"Custo do caminho: " << resul << endl;
+		dec.mostraCromossomo(crom);
+		*/
 	
 		/*
 		SampleDecoder decoder;			// initialize the decoder
-		Decoder dec;
+		//Decoder dec;
 
 
 		const long unsigned rngSeed = 0;	// seed to the random number generator
@@ -65,8 +61,8 @@ int main(int argc, char* argv[]) {
 		
 		std::cout << "Best solution found has objective value = "
 				<< algorithm.getBestFitness() << std::endl;
-		*/
-	
+		
+	*/
 	}
 	
 	return 0;
