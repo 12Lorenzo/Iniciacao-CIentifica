@@ -34,7 +34,7 @@ Decoder::~Decoder(){}
 //A entrada desse decoder é baseado na do SampleDecoder
 double Decoder::decode(const std::vector< double >& chromosome) const {
     //std::cout << "Socorro";
-    return 0.1;
+    return distTotal;
 }
 
 //Esse decode funciona a partir da instancia que é dada como entrada
@@ -49,6 +49,8 @@ double Decoder::decode(Instancia inst){
     }
  
     distCir += dist[get<0>(crom[inst.getNumNos() - 1])][get<0>(crom[0])];
+
+    distTotal = distCir;
 
     return distCir;
 }

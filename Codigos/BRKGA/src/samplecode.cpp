@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
 		
 		vector<tuple<int, float, double, double>> crom = dec.formaCromossomo(inst.getNumNos(), inst.getNos());
 
-		std::cout <<"Custo do caminho: " << dec.decode(inst) << endl;
+		double a = dec.decode(inst);
 
 		/*
 		dec.mostraCromossomo(crom);
@@ -34,18 +34,15 @@ int main(int argc, char* argv[]) {
 		cout<<endl;
 		dec.mostraCromossomo(crom);
 		*/
-	
-		/*
+		
 		SampleDecoder decoder;			// initialize the decoder
-		//Decoder dec;
-
 
 		const long unsigned rngSeed = 0;	// seed to the random number generator
 		MTRand rng(rngSeed);				// initialize the random number generator
 		
 		// initialize the BRKGA-based heuristic
-		BRKGA< SampleDecoder, MTRand > algorithm(n, p, pe, pm, rhoe, decoder, rng, K, MAXT);
-		//BRKGA< Decoder, MTRand > algorithm(n, p, pe, pm, rhoe, dec, rng, K, MAXT);
+		//BRKGA< SampleDecoder, MTRand > algorithm(n, p, pe, pm, rhoe, decoder, rng, K, MAXT);
+		BRKGA< Decoder, MTRand > algorithm(n, p, pe, pm, rhoe, dec, rng, K, MAXT);
 		
 		unsigned generation = 0;		// current generation
 		const unsigned X_INTVL = 100;	// exchange best individuals at every 100 generations
@@ -62,7 +59,7 @@ int main(int argc, char* argv[]) {
 		std::cout << "Best solution found has objective value = "
 				<< algorithm.getBestFitness() << std::endl;
 		
-	*/
+	
 	}
 	
 	return 0;
