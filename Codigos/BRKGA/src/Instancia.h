@@ -24,6 +24,9 @@ public:
     vector<vector<double>> getMatDistancias();
 
     //Funcao para calcular a distancia entre dois pontos
+    double calcDist(int no1, int no2);
+
+    //Retorna a distancia entre dois nos
     double getDist(int no1, int no2);
 
     //Função para preencher a matriz de distancias
@@ -52,6 +55,8 @@ private:
     vector<pair<double, double>> nos;
     vector<vector<double>> distancias;
 };
+
+
 
 Instancia::Instancia(string nomeArq){
     
@@ -133,7 +138,7 @@ vector<vector<double>> Instancia::getMatDistancias(){
     return distancias;
 }
 
-double Instancia::getDist(int no1, int no2){
+double Instancia::calcDist(int no1, int no2){
     double result;
     double cat1, cat2;
     cat1 = nos[no1].first - nos[no2].first;
@@ -142,6 +147,10 @@ double Instancia::getDist(int no1, int no2){
     result = sqrt(pow(cat1, 2) + pow(cat2, 2));
 
     return result;
+}
+
+double Instancia::getDist(int no1, int no2){
+    return distancias[no1][no2];
 }
 
 void Instancia::formaMatDistancias(){
@@ -153,9 +162,7 @@ void Instancia::formaMatDistancias(){
         vector<double> lin;
         for(j = 0; j < numNos; j++){
             //mostraPontoDist(i, j);
-            lin.push_back(getDist(i, j));
-
-
+            lin.push_back(calcDist(i, j));
         }
         distancias.push_back(lin);
     }    

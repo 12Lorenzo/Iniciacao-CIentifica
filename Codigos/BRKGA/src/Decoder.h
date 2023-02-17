@@ -13,78 +13,39 @@
 class Decoder{
 
 public:
-    Decoder();
+    Decoder(Instancia *inst);
     ~Decoder();
     
     double decode(const std::vector< double >& chromosome) const;
-    double decode(Instancia inst);
-    vector<tuple< int, float, double, double>> ordena(vector<tuple<int, float, double, double>> cromossomo);
-    vector<tuple<int, float, double, double>> formaCromossomo(int quantNo, vector<pair<double, double>> coords);
     void mostraCromossomo(vector<tuple<int, float, double, double>> cromossomo);
 
 private:
-    double distTotal;
+    Instancia *inst;
 };
 
-Decoder::Decoder(){}
+Decoder::Decoder(Instancia *inst){
+    this->inst = inst;
+}
 
 Decoder::~Decoder(){}
 
 //A entrada desse decoder é baseado na do SampleDecoder
 double Decoder::decode(const std::vector< double >& chromosome) const {
-    //std::cout << "Socorro";
-    return distTotal;
-}
-
-//Esse decode funciona a partir da instancia que é dada como entrada
-double Decoder::decode(Instancia inst){
     double distCir = 0;
-	vector<tuple< int, float, double, double>> crom = formaCromossomo(inst.getNumNos(), inst.getNos());
-    crom = ordena(crom);
-    vector<vector<double>> dist = inst.getMatDistancias();
+    vector<pair< double, int>> crom;
+    for (unsigned int i = 0; i < chromosome.size(); i++){
+        crom.push_back(make_pair(chromosome[i], i));
+    }
+
+	sort(crom.begin() + 1, crom.end());
     
-    for (int i = 0; i < inst.getNumNos() - 1; i++){
-        distCir += dist[get<0>(crom[i])][get<0>(crom[i+1])];        
+    for (int i = 0; i < crom.size() - 1; i++){
+        distCir += inst->getDist(crom[i].second, crom[i+1].second);
     }
  
-    distCir += dist[get<0>(crom[inst.getNumNos() - 1])][get<0>(crom[0])];
-
-    distTotal = distCir;
+    distCir += inst->getDist(crom[crom.size() - 1].second, 0);
 
     return distCir;
-}
-
-//Foi usado o selection sort para ordenar o cromossomo
-vector<tuple< int, float, double, double>> Decoder::ordena(vector<tuple< int, float, double, double>> cromossomo){
-    int tamCrom = cromossomo.size();
-    int min;
-
-    for (auto it = 1; it < tamCrom; ++it){
-        min = it;
-
-        for (auto itj = it + 1; itj < tamCrom; ++itj){
-            if (get<1>(cromossomo[itj]) < get<1>(cromossomo[min])){
-                min = itj;
-            }
-        }
-        if(min != it){
-            swap(cromossomo[min], cromossomo[it]);
-        }
-    }
-
-    return cromossomo;
-}
-
-vector<tuple<int, float, double, double>> Decoder::formaCromossomo(int quantNo, vector<pair<double, double>> coords){
-    vector<tuple<int, float, double, double>> crom;
-    int i;
-    srand(time(0));
-    for (i = 0; i < quantNo; i++){
-        float valAleatorio = static_cast<double>(rand()) / RAND_MAX;
-        crom.push_back(make_tuple(i, valAleatorio, coords[i].first, coords[i].second));
-    }
-
-    return crom;
 }
 
 void Decoder::mostraCromossomo(vector<tuple<int, float, double, double>> cromossomo){

@@ -21,21 +21,9 @@ int main(int argc, char* argv[]) {
 		Instancia inst = Instancia(argv[1]);
 		inst.formaMatDistancias();
 		
-		Decoder dec;
+		Decoder dec(&inst);
 		
-		vector<tuple<int, float, double, double>> crom = dec.formaCromossomo(inst.getNumNos(), inst.getNos());
-
-		double a = dec.decode(inst);
-
-		/*
-		dec.mostraCromossomo(crom);
-		cout<< endl;
-		crom = dec.ordena(crom);
-		cout<<endl;
-		dec.mostraCromossomo(crom);
-		*/
-		
-		SampleDecoder decoder;			// initialize the decoder
+		//SampleDecoder decoder;			// initialize the decoder
 
 		const long unsigned rngSeed = 0;	// seed to the random number generator
 		MTRand rng(rngSeed);				// initialize the random number generator
