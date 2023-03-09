@@ -17,7 +17,7 @@ public:
     ~Decoder();
     
     double decode(const std::vector< double >& chromosome) const;
-    void mostraCromossomo(vector<tuple<int, float, double, double>> cromossomo);
+    void mostraCromossomo(vector<pair<double, int>> cromossomo);
 
 private:
     Instancia *inst;
@@ -39,6 +39,7 @@ double Decoder::decode(const std::vector< double >& chromosome) const {
 
 	sort(crom.begin() + 1, crom.end());
     
+    
     for (int i = 0; i < crom.size() - 1; i++){
         distCir += inst->getDist(crom[i].second, crom[i+1].second);
     }
@@ -48,15 +49,11 @@ double Decoder::decode(const std::vector< double >& chromosome) const {
     return distCir;
 }
 
-void Decoder::mostraCromossomo(vector<tuple<int, float, double, double>> cromossomo){
-	int x;
-    double y;
-    int cont = 0;
+void Decoder::mostraCromossomo(vector<pair<double, int>> cromossomo){
 
-    for (auto it = cromossomo.begin(); it != cromossomo.end(); ++it) {
-        std::cout << "No: " << get<0>(cromossomo[cont]) << " Valor: " << get<1>(cromossomo[cont]) 
-                  << " CoordX: " << get<2>(cromossomo[cont]) << " CoordY: " << get<3>(cromossomo[cont]) << std::endl;
-        cont++;
+    for (auto it = 0; it != cromossomo.size(); ++it) {
+        std::cout << "No: " << cromossomo[it].second << " Valor: " << cromossomo[it].first << std::endl;
+    
     }
 }
 
